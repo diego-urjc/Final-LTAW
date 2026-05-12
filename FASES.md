@@ -14,7 +14,7 @@
 - **CSS personalizado** con 18 tipos elementales y componentes de juego
 
 ### Estado Final
-✅ Base Django operativa con diseño responsive y sistema de autenticación configurado
+ Base Django operativa con diseño responsive y sistema de autenticación configurado
 
 ---
 
@@ -32,7 +32,7 @@
 - **Sistema de mensajes** success/error/info
 
 ### Estado Final
-✅ Autenticación completa con flujo registro → login → perfil protegido
+Autenticación completa con flujo registro → login → perfil protegido
 
 ---
 
@@ -49,7 +49,7 @@
 - **Métodos personalizados**: Conteos y cálculos dinámicos
 
 ### Estado Final
-✅ Estructura de datos completa con migraciones generadas y admin funcional
+Estructura de datos completa con migraciones generadas y admin funcional
 
 ---
 
@@ -62,9 +62,9 @@
 - **Sistema de combate** por turnos
 
 ### Estado Actual del Proyecto
-- ✅ **Base Django** configurada
-- ✅ **Autenticación** funcional  
-- ✅ **Modelos de datos** definidos
+- **Base Django** configurada
+- **Autenticación** funcional  
+- **Modelos de datos** definidos
 - ❌ **Interfaz de usuario** para gestión de criaturas/equipos
 - ❌ **Datos de juego** cargados
 

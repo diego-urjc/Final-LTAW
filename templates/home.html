@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <!-- Hero Section -->
+        <div class="hero-section mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                <i class="bi bi-trophy-fill"></i> PocketArena
+            </h1>
+            <p class="lead mb-4">
+                {{ description }}
+            </p>
+            <p class="text-muted">
+                Crea equipos de criaturas poderosas y desafía a oponentes en emocionantes combates por turnos.
+            </p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill text-primary fs-1 mb-3"></i>
+                        <h5 class="card-title">Crea Equipos</h5>
+                        <p class="card-text">Reúne criaturas con diferentes habilidades y tipos para formar el equipo perfecto.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightning-fill text-warning fs-1 mb-3"></i>
+                        <h5 class="card-title">Combate Estratégico</h5>
+                        <p class="card-text">Sistema de combate por turnos con mecánicas profundas y tipos elementales.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up text-success fs-1 mb-3"></i>
+                        <h5 class="card-title">Progresa</h5>
+                        <p class="card-text">Gana experiencia, desbloquea nuevas criaturas y mejora tus habilidades.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        {% if user.is_authenticated %}
+            <div class="alert alert-success">
+                <h4 class="alert-heading"><i class="bi bi-check-circle-fill"></i> ¡Bienvenido de vuelta!</h4>
+                <p class="mb-0">Estás listo para continuar tu aventura en PocketArena.</p>
+                <hr>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="#" class="btn btn-primary">
+                        <i class="bi bi-people"></i> Mis Equipos
+                    </a>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="bi bi-lightning"></i> Nuevo Combate
+                    </a>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-person"></i> Mi Perfil
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <h4 class="alert-heading"><i class="bi bi-info-circle-fill"></i> ¿Listo para empezar?</h4>
+                <p class="mb-0">Únete a PocketArena y comienza tu viaje como entrenador de criaturas.</p>
+                <hr>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Registrarse
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Quick Stats -->
+        <div class="row g-3 mt-4">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3 class="text-primary">150+</h3>
+                        <p class="mb-0">Criaturas Únicas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3 class="text-success">18</h3>
+                        <p class="mb-0">Tipos Elementales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3 class="text-warning">500+</h3>
+                        <p class="mb-0">Movimientos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3 class="text-info">∞</h3>
+                        <p class="mb-0">Combates</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

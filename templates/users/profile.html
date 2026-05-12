@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">
+                            <i class="bi bi-person-circle"></i> Perfil de Usuario
+                        </h3>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-success fs-6">
+                            <i class="bi bi-check-circle"></i> Activo
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Información del usuario -->
+                    <div class="col-md-8">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-info-circle"></i> Información Personal
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Nombre de usuario:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-light text-dark">{{ user.username }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Correo electrónico:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-light text-dark">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Fecha de registro:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-light text-dark">{{ user.date_joined|date:"d/m/Y H:i" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <strong>Último acceso:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-light text-dark">{{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas del jugador -->
+                    <div class="col-md-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-graph-up"></i> Estadísticas
+                        </h5>
+                        
+                        <div class="card bg-light mb-2">
+                            <div class="card-body text-center">
+                                <h3 class="text-primary">0</h3>
+                                <p class="mb-0">Combates Totales</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-light mb-2">
+                            <div class="card-body text-center">
+                                <h3 class="text-success">0</h3>
+                                <p class="mb-0">Victorias</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-light mb-2">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">0</h3>
+                                <p class="mb-0">Equipos Creados</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Acciones disponibles -->
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-3">
+                            <i class="bi bi-lightning"></i> Acciones Rápidas
+                        </h5>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="#" class="btn btn-primary">
+                                <i class="bi bi-people"></i> Mis Equipos
+                            </a>
+                            <a href="#" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Nuevo Equipo
+                            </a>
+                            <a href="#" class="btn btn-warning">
+                                <i class="bi bi-lightning"></i> Nuevo Combate
+                            </a>
+                            <a href="#" class="btn btn-info">
+                                <i class="bi bi-clock-history"></i> Historial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mensaje informativo -->
+        <div class="alert alert-info mt-3">
+            <h5 class="alert-heading">
+                <i class="bi bi-info-circle"></i> ¡Bienvenido a PocketArena!
+            </h5>
+            <p class="mb-0">
+                Tu perfil está listo para comenzar. Empieza creando tu primer equipo de criaturas 
+                y desafía a otros entrenadores en emocionantes combates por turnos.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.badge {
+    font-size: 0.9em;
+    padding: 8px 12px;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.row > div {
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}

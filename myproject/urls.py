@@ -27,4 +27,12 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("register/", views.register, name="register"),
     path("profile/", views.profile, name="profile"),
+    
+    # Rutas de Equipos (CRUD)
+    path("teams/", views.team_list, name="team_list"),
+    path("teams/my/", views.my_teams, name="my_teams"),
+    path("teams/<int:team_id>/", views.team_detail, name="team_detail"),
+    path("teams/create/", views.team_create, name="team_create"),
+    path("teams/<int:team_id>/edit/", views.team_update, name="team_update"),
+    path("teams/<int:team_id>/delete/", views.team_delete, name="team_delete"),
 ]

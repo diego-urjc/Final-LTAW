@@ -39,8 +39,13 @@
                     
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-people-fill"></i> Equipos
+                            <a class="nav-link" href="{% url 'my_teams' %}">
+                                <i class="bi bi-people-fill"></i> Mis Equipos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'team_list' %}">
+                                <i class="bi bi-globe"></i> Equipos Públicos
                             </a>
                         </li>
                         <li class="nav-item">
@@ -51,6 +56,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="bi bi-grid-3x3-gap-fill"></i> Criaturas
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'team_list' %}">
+                                <i class="bi bi-globe"></i> Equipos Públicos
                             </a>
                         </li>
                     {% endif %}
@@ -122,8 +133,11 @@
                     <h5>Enlaces Rápidos</h5>
                     <ul class="list-unstyled">
                         {% if user.is_authenticated %}
-                            <li><a href="#" class="text-light">Mis Equipos</a></li>
+                            <li><a href="{% url 'my_teams' %}" class="text-light">Mis Equipos</a></li>
+                            <li><a href="{% url 'team_list' %}" class="text-light">Equipos Públicos</a></li>
                             <li><a href="#" class="text-light">Historial de Combates</a></li>
+                        {% else %}
+                            <li><a href="{% url 'team_list' %}" class="text-light">Equipos Públicos</a></li>
                         {% endif %}
                         <li><a href="{% url 'admin:index' %}" class="text-light">Administración</a></li>
                     </ul>

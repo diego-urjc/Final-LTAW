@@ -21,13 +21,15 @@
         <!-- Feature Cards -->
         <div class="row g-4 mb-5">
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-people-fill text-primary fs-1 mb-3"></i>
-                        <h5 class="card-title">Crea Equipos</h5>
-                        <p class="card-text">Reúne criaturas con diferentes habilidades y tipos para formar el equipo perfecto.</p>
+                <a href="{% url 'team_create' %}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people-fill text-primary fs-1 mb-3"></i>
+                            <h5 class="card-title">Crea Equipos</h5>
+                            <p class="card-text">Reúne criaturas con diferentes habilidades y tipos para formar el equipo perfecto.</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="col-md-4">
@@ -58,7 +60,7 @@
                 <p class="mb-0">Estás listo para continuar tu aventura en PocketArena.</p>
                 <hr>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="#" class="btn btn-primary">
+                    <a href="{% url 'my_teams' %}" class="btn btn-primary">
                         <i class="bi bi-people"></i> Mis Equipos
                     </a>
                     <a href="#" class="btn btn-outline-primary">

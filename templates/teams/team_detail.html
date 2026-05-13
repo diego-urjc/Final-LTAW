@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'team_list' %}">Equipos</a></li>
+                <li class="breadcrumb-item active">{{ team.name }}</li>
+            </ol>
+        </nav>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-shield-fill"></i> {{ team.name }}</h1>
+            {% if is_owner %}
+                <div class="btn-group">
+                    <a href="{% url 'team_update' team.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil-fill"></i> Editar
+                    </a>
+                    <a href="{% url 'team_delete' team.id %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash-fill"></i> Eliminar
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <!-- Información del equipo -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle-fill"></i> Información</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong><i class="bi bi-person-fill"></i> Entrenador:</strong> {{ team.user.username }}</p>
+                        <p><strong><i class="bi bi-calendar-fill"></i> Creado:</strong> {{ team.created_at|date:"d/m/Y H:i" }}</p>
+                        <p><strong><i class="bi bi-clock-fill"></i> Actualizado:</strong> {{ team.updated_at|date:"d/m/Y H:i" }}</p>
+                        <p><strong><i class="bi bi-people-fill"></i> Criaturas:</strong> {{ team.get_creature_count }}</p>
+                        {% if team.is_public %}
+                            <p><span class="badge bg-success"><i class="bi bi-globe-fill"></i> Público</span></p>
+                        {% else %}
+                            <p><span class="badge bg-secondary"><i class="bi bi-lock-fill"></i> Privado</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if team.description %}
+                    <div class="card mt-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="bi bi-card-text-fill"></i> Descripción</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ team.description }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Criaturas del equipo -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-grid-3x3-gap-fill"></i> Criaturas del Equipo</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if team_creatures %}
+                            <div class="row">
+                                {% for team_creature in team_creatures %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="card-title mb-0">
+                                                        <span class="badge bg-primary">#{{ team_creature.position }}</span>
+                                                        {{ team_creature.creature.name }}
+                                                    </h6>
+                                                    <span class="badge bg-info">{{ team_creature.creature.get_types_display }}</span>
+                                                </div>
+                                                <hr>
+                                                <div class="row text-center">
+                                                    <div class="col-3">
+                                                        <small class="text-muted">HP</small><br>
+                                                        <strong>{{ team_creature.creature.hp }}</strong>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <small class="text-muted">ATK</small><br>
+                                                        <strong>{{ team_creature.creature.attack }}</strong>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <small class="text-muted">DEF</small><br>
+                                                        <strong>{{ team_creature.creature.defense }}</strong>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <small class="text-muted">SPD</small><br>
+                                                        <strong>{{ team_creature.creature.speed }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill"></i> 
+                                Este equipo aún no tiene criaturas asignadas.
+                                {% if is_owner %}
+                                    <a href="#" class="alert-link">Añadir criaturas</a> (próximamente).
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

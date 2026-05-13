@@ -12,11 +12,13 @@ class CreatureAdmin(admin.ModelAdmin):
     
     list_display = [
         'name', 'get_types_display', 'hp', 'attack', 'defense', 
-        'speed', 'created_at'
+        'speed', 'sp_attack', 'sp_defense', 'created_at'
     ]
-    list_filter = ['type1', 'type2', 'created_at']
+    list_filter = ['type1', 'type2', 'created_at', 'updated_at']
     search_fields = ['name', 'description']
     ordering = ['name']
+    date_hierarchy = 'created_at'
+    list_per_page = 25
     
     fieldsets = (
         ('Información Básica', {
@@ -47,9 +49,11 @@ class MoveAdmin(admin.ModelAdmin):
         'name', 'get_type_display', 'category', 'power', 
         'accuracy', 'pp', 'created_at'
     ]
-    list_filter = ['type', 'category', 'power', 'created_at']
+    list_filter = ['type', 'category', 'power', 'accuracy', 'created_at', 'updated_at']
     search_fields = ['name', 'description']
     ordering = ['name']
+    date_hierarchy = 'created_at'
+    list_per_page = 50
     
     fieldsets = (
         ('Información Básica', {
@@ -70,12 +74,17 @@ class MoveAdmin(admin.ModelAdmin):
 class CreatureMoveAdmin(admin.ModelAdmin):
     """Administración de Movimientos de Criaturas"""
     
-    list_display = ['creature', 'move', 'level_learned']
-    list_filter = ['level_learned', 'creature__type1', 'move__type']
+    list_display = ['creature', 'move', 'level_learned', 'get_move_type_display']
+    list_filter = ['level_learned', 'creature__type1', 'creature__type2', 'move__type', 'move__category']
     search_fields = ['creature__name', 'move__name']
     ordering = ['creature', 'level_learned']
+    list_per_page = 50
     
     autocomplete_fields = ['creature', 'move']
+    
+    def get_move_type_display(self, obj):
+        return obj.move.get_type_display()
+    get_move_type_display.short_description = 'Tipo de Movimiento'
 
 
 class TeamCreatureInline(admin.TabularInline):
@@ -85,6 +94,7 @@ class TeamCreatureInline(admin.TabularInline):
     extra = 1
     min_num = 1
     max_num = 6
+    autocomplete_fields = ['creature']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('creature')
@@ -94,10 +104,13 @@ class TeamCreatureInline(admin.TabularInline):
 class TeamAdmin(admin.ModelAdmin):
     """Administración de Equipos"""
     
-    list_display = ['name', 'user', 'get_creature_count', 'is_public', 'created_at']
-    list_filter = ['is_public', 'created_at', 'user']
+    list_display = ['name', 'user', 'get_creature_count', 'is_public', 'updated_at', 'created_at']
+    list_filter = ['is_public', 'created_at', 'updated_at', 'user']
     search_fields = ['name', 'description', 'user__username']
     ordering = ['-updated_at']
+    list_editable = ['is_public']
+    date_hierarchy = 'created_at'
+    list_per_page = 25
     
     fieldsets = (
         ('Información Básica', {
@@ -111,6 +124,7 @@ class TeamAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
     
     inlines = [TeamCreatureInline]
+    autocomplete_fields = ['user']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user').prefetch_related('creatures')
@@ -121,7 +135,8 @@ class BattleTurnInline(admin.TabularInline):
     
     model = BattleTurn
     extra = 0
-    readonly_fields = ['created_at']
+    readonly_fields = ['turn_number', 'player1_action', 'player2_action', 'created_at']
+    can_delete = False
     
     def get_queryset(self, request):
         return super().get_queryset(request).order_by('turn_number')
@@ -135,12 +150,14 @@ class BattleAdmin(admin.ModelAdmin):
         'get_battle_display', 'status', 'current_turn', 
         'winner', 'created_at', 'get_duration'
     ]
-    list_filter = ['status', 'winner', 'created_at']
+    list_filter = ['status', 'winner', 'created_at', 'started_at', 'finished_at']
     search_fields = [
         'player1__username', 'player2__username', 
         'team1__name', 'team2__name'
     ]
     ordering = ['-created_at']
+    date_hierarchy = 'created_at'
+    list_per_page = 20
     
     fieldsets = (
         ('Información del Combate', {
@@ -160,6 +177,7 @@ class BattleAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'started_at', 'finished_at']
     
     inlines = [BattleTurnInline]
+    autocomplete_fields = ['player1', 'player2', 'team1', 'team2']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
@@ -192,12 +210,14 @@ class BattleTurnAdmin(admin.ModelAdmin):
         'battle', 'turn_number', 'player1_action', 
         'player2_action', 'damage_dealt_p1', 'damage_dealt_p2', 'created_at'
     ]
-    list_filter = ['turn_number', 'created_at', 'battle__status']
+    list_filter = ['turn_number', 'created_at', 'battle__status', 'damage_dealt_p1', 'damage_dealt_p2']
     search_fields = [
         'battle__player1__username', 'battle__player2__username',
         'player1_action', 'player2_action', 'turn_result'
     ]
     ordering = ['-battle', '-turn_number']
+    date_hierarchy = 'created_at'
+    list_per_page = 50
     
     fieldsets = (
         ('Información del Turno', {
@@ -221,6 +241,7 @@ class BattleTurnAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['created_at']
+    autocomplete_fields = ['battle']
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('battle')

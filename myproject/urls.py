@@ -35,4 +35,20 @@ urlpatterns = [
     path("teams/create/", views.team_create, name="team_create"),
     path("teams/<int:team_id>/edit/", views.team_update, name="team_update"),
     path("teams/<int:team_id>/delete/", views.team_delete, name="team_delete"),
+    path("teams/<int:team_id>/creatures/add/", views.team_add_creature, name="team_add_creature"),
+    path("teams/<int:team_id>/creatures/<int:tc_id>/remove/", views.team_remove_creature, name="team_remove_creature"),
+    
+    # Rutas de Combates
+    path("battle/", views.battle_setup, name="battle_setup"),
+    path("battle/normal/", views.battle_normal_setup, name="battle_normal_setup"),
+    path("battle/random/", views.battle_random_start, name="battle_random_start"),
+    path("battle/turn/", views.battle_turn, name="battle_turn"),
+    path("battle/result/", views.battle_result, name="battle_result"),
+
+    # Rutas de Criaturas
+    path("creatures/", views.creature_list, name="creature_list"),
+    
+    # Rutas de IA
+    path("ai/recommendation/", views.get_ai_recommendation, name="ai_recommendation"),
+    path("ai/history/", views.ai_history, name="ai_history"),
 ]

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-sword"></i> Configurar Combate 1vs1
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-person"></i> Criatura 1
+                            </h5>
+                            <div class="form-group mb-3">
+                                <label for="creature1" class="form-label">Selecciona tu criatura:</label>
+                                <select class="form-select" id="creature1" name="creature1" required>
+                                    <option value="">-- Elige una criatura --</option>
+                                    {% for creature in creatures %}
+                                    <option value="{{ creature.id }}">
+                                        {{ creature.name }} (HP: {{ creature.hp }}, ATK: {{ creature.attack }}, SPD: {{ creature.speed }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-warning mb-3">
+                                <i class="bi bi-person-badge"></i> Criatura 2 (Oponente)
+                            </h5>
+                            <div class="form-group mb-3">
+                                <label for="creature2" class="form-label">Selecciona el oponente:</label>
+                                <select class="form-select" id="creature2" name="creature2" required>
+                                    <option value="">-- Elige una criatura --</option>
+                                    {% for creature in creatures %}
+                                    <option value="{{ creature.id }}">
+                                        {{ creature.name }} (HP: {{ creature.hp }}, ATK: {{ creature.attack }}, SPD: {{ creature.speed }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <div>
+                            <button type="button" class="btn btn-info me-2" onclick="getAIRecommendation()">
+                                <i class="bi bi-robot"></i> Consejos IA
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-sword"></i> Iniciar Combate
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <h5 class="alert-heading">
+                <i class="bi bi-info-circle"></i> Reglas del Combate
+            </h5>
+            <ul class="mb-0">
+                <li>Combate 1vs1 simple</li>
+                <li>Cada criatura tiene puntos de vida (HP)</li>
+                <li>Los movimientos causan daño fijo</li>
+                <li>El orden de turnos depende de la velocidad (SPD)</li>
+                <li>Gana quien reduzca el HP del oponente a 0 primero</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+</style>
+
+<script>
+function getAIRecommendation() {
+    const creature1 = document.getElementById('creature1').value;
+    const creature2 = document.getElementById('creature2').value;
+    
+    if (!creature1 || !creature2) {
+        alert('Por favor, selecciona ambas criaturas antes de pedir consejos de IA.');
+        return;
+    }
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "ai_recommendation" %}';
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    form.appendChild(csrfToken);
+    
+    const contextInput = document.createElement('input');
+    contextInput.type = 'hidden';
+    contextInput.name = 'context';
+    contextInput.value = 'battle';
+    form.appendChild(contextInput);
+    
+    const creature1Input = document.createElement('input');
+    creature1Input.type = 'hidden';
+    creature1Input.name = 'creature1';
+    creature1Input.value = creature1;
+    form.appendChild(creature1Input);
+    
+    const creature2Input = document.createElement('input');
+    creature2Input.type = 'hidden';
+    creature2Input.name = 'creature2';
+    creature2Input.value = creature2;
+    form.appendChild(creature2Input);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

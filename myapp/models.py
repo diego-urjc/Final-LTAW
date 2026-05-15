@@ -326,3 +326,36 @@ class BattleTurn(models.Model):
     
     def __str__(self):
         return f"Turno {self.turn_number} - {self.battle}"
+
+
+class AIMessage(models.Model):
+    """Almacenamiento de mensajes y recomendaciones de la IA"""
+    
+    CONTEXT_CHOICES = [
+        ('team', 'Análisis de Equipo'),
+        ('battle', 'Recomendación de Combate'),
+        ('general', 'Consejo General'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
+    context = models.CharField(max_length=20, choices=CONTEXT_CHOICES, verbose_name="Contexto")
+    
+    # Datos enviados a la IA (JSON)
+    input_data = models.JSONField(verbose_name="Datos de Entrada")
+    
+    # Respuesta de la IA
+    recommendation = models.TextField(verbose_name="Recomendación")
+    
+    # Metadatos
+    creature = models.ForeignKey(Creature, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Criatura Relacionada")
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Equipo Relacionado")
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado")
+    
+    class Meta:
+        verbose_name = "Mensaje de IA"
+        verbose_name_plural = "Mensajes de IA"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"IA - {self.user.username} - {self.get_context_display()}"

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg">
+            <div class="card-header {% if winner == 1 %}bg-primary{% elif winner == 2 %}bg-warning{% else %}bg-secondary{% endif %} text-white">
+                <h3 class="mb-0 text-center">
+                    <i class="bi bi-trophy"></i> ¡Combate Finalizado!
+                </h3>
+            </div>
+            <div class="card-body text-center">
+                {% if winner == 1 %}
+                <div class="alert alert-success">
+                    <h2 class="alert-heading"><i class="bi bi-trophy-fill"></i> ¡{{ winner_name }} gana!</h2>
+                    <p class="mb-0">Has derrotado al equipo rival.</p>
+                </div>
+                {% elif winner == 2 %}
+                <div class="alert alert-warning">
+                    <h2 class="alert-heading"><i class="bi bi-trophy-fill"></i> ¡{{ winner_name }} gana!</h2>
+                    <p class="mb-0">Tu equipo ha sido derrotado.</p>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <h2 class="alert-heading"><i class="bi bi-hand-thumbs-up"></i> ¡Empate!</h2>
+                    <p class="mb-0">Ambos equipos han caído simultáneamente.</p>
+                </div>
+                {% endif %}
+                
+                <hr>
+                
+                <!-- Estado final de cada equipo -->
+                <div class="row mb-4 text-start">
+                    <div class="col-md-6">
+                        <div class="card bg-light h-100">
+                            <div class="card-header"><strong>Tu equipo</strong> · {{ survivors_1 }} en pie</div>
+                            <ul class="list-group list-group-flush">
+                                {% for slot in team1_slots %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center {% if slot.fainted %}text-muted text-decoration-line-through{% endif %}">
+                                        <span>#{{ slot.index|add:1 }} {{ slot.creature.name }}</span>
+                                        <span class="badge {% if slot.fainted %}bg-secondary{% else %}bg-success{% endif %}">
+                                            {{ slot.hp_current }}/{{ slot.hp_max }} HP
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light h-100">
+                            <div class="card-header"><strong>Equipo rival</strong> · {{ survivors_2 }} en pie</div>
+                            <ul class="list-group list-group-flush">
+                                {% for slot in team2_slots %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center {% if slot.fainted %}text-muted text-decoration-line-through{% endif %}">
+                                        <span>#{{ slot.index|add:1 }} {{ slot.creature.name }}</span>
+                                        <span class="badge {% if slot.fainted %}bg-secondary{% else %}bg-success{% endif %}">
+                                            {{ slot.hp_current }}/{{ slot.hp_max }} HP
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-clock"></i> Duración del Combate
+                    </h5>
+                    <p class="mb-0">Total de turnos: <strong>{{ total_turns }}</strong></p>
+                </div>
+                
+                <!-- Resumen del combate -->
+                <div class="card bg-light mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> Resumen del Combate
+                        </h5>
+                    </div>
+                    <div class="card-body text-start" style="max-height: 300px; overflow-y: auto;">
+                        {% for entry in log %}
+                        <div class="py-1 {% if entry.player == 1 %}text-primary{% else %}text-warning{% endif %}">
+                            <strong>Turno {{ entry.turn }}:</strong> 
+                            {{ entry.creature }} usó {{ entry.move }} → {{ entry.damage }} daño a {{ entry.target }}
+                            (HP: {{ entry.target_hp }})
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center">No hay registros del combate.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Acciones -->
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'battle_setup' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-repeat"></i> Nuevo Combate
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        <i class="bi bi-house"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+</style>
+{% endblock %}

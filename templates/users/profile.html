@@ -73,21 +73,28 @@
                         
                         <div class="card bg-light mb-2">
                             <div class="card-body text-center">
-                                <h3 class="text-primary">0</h3>
+                                <h3 class="text-primary">{{ battles_count }}</h3>
                                 <p class="mb-0">Combates Totales</p>
                             </div>
                         </div>
                         
                         <div class="card bg-light mb-2">
                             <div class="card-body text-center">
-                                <h3 class="text-success">0</h3>
+                                <h3 class="text-success">{{ victories }}</h3>
                                 <p class="mb-0">Victorias</p>
                             </div>
                         </div>
                         
                         <div class="card bg-light mb-2">
                             <div class="card-body text-center">
-                                <h3 class="text-warning">0</h3>
+                                <h3 class="text-danger">{{ defeats }}</h3>
+                                <p class="mb-0">Derrotas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-light mb-2">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ teams_count }}</h3>
                                 <p class="mb-0">Equipos Creados</p>
                             </div>
                         </div>
@@ -104,17 +111,14 @@
                         </h5>
                         
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="#" class="btn btn-primary">
+                            <a href="{% url 'my_teams' %}" class="btn btn-primary">
                                 <i class="bi bi-people"></i> Mis Equipos
                             </a>
-                            <a href="#" class="btn btn-success">
+                            <a href="{% url 'team_create' %}" class="btn btn-success">
                                 <i class="bi bi-plus-circle"></i> Nuevo Equipo
                             </a>
-                            <a href="#" class="btn btn-warning">
-                                <i class="bi bi-lightning"></i> Nuevo Combate
-                            </a>
-                            <a href="#" class="btn btn-info">
-                                <i class="bi bi-clock-history"></i> Historial
+                            <a href="{% url 'team_list' %}" class="btn btn-info">
+                                <i class="bi bi-globe"></i> Equipos Públicos
                             </a>
                         </div>
                     </div>

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-robot"></i> Obtener Recomendación de IA
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="context" class="form-label">Tipo de Análisis</label>
+                            <select class="form-select" id="context" name="context" required>
+                                <option value="battle" {% if preselected_context == 'battle' %}selected{% endif %}>Recomendación de Combate</option>
+                                <option value="team" {% if preselected_context == 'team' %}selected{% endif %}>Análisis de Equipo Completo</option>
+                            </select>
+                        </div>
+                        
+                        <div id="battle-options" class="mb-3" {% if preselected_context == 'team' %}style="display: none;"{% endif %}>
+                            <label class="form-label">Selecciona las criaturas para el combate</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="creature1" class="form-label">Tu Criatura</label>
+                                    <select class="form-select" id="creature1" name="creature1">
+                                        <option value="">-- Elige una criatura --</option>
+                                        {% for creature in creatures %}
+                                        <option value="{{ creature.id }}">{{ creature.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="creature2" class="form-label">Criatura Enemiga</label>
+                                    <select class="form-select" id="creature2" name="creature2">
+                                        <option value="">-- Elige una criatura --</option>
+                                        {% for creature in creatures %}
+                                        <option value="{{ creature.id }}">{{ creature.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="team-options" class="mb-3" {% if preselected_context != 'team' %}style="display: none;"{% endif %}>
+                            <label for="team" class="form-label">Selecciona tu Equipo</label>
+                            <select class="form-select" id="team" name="team">
+                                <option value="">-- Elige un equipo --</option>
+                                {% for team in user_teams %}
+                                <option value="{{ team.id }}" {% if preselected_team_id and preselected_team_id|stringformat:"s" == team.id|stringformat:"s" %}selected{% endif %}>{{ team.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Esta función utiliza la API de NVIDIA Build. Puede tardar unos segundos en generar la recomendación.
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-magic"></i> Obtener Recomendación
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('context').addEventListener('change', function() {
+    const battleOptions = document.getElementById('battle-options');
+    const teamOptions = document.getElementById('team-options');
+    
+    if (this.value === 'battle') {
+        battleOptions.style.display = 'block';
+        teamOptions.style.display = 'none';
+    } else if (this.value === 'team') {
+        battleOptions.style.display = 'none';
+        teamOptions.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

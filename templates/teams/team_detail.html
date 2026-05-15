@@ -57,13 +57,26 @@
                         </div>
                     </div>
                 {% endif %}
+
+                {% if is_owner %}
+                    <div class="d-grid mt-3">
+                        <a href="{% url 'ai_recommendation' %}?team={{ team.id }}" class="btn btn-info text-white">
+                            <i class="bi bi-robot"></i> Pedir análisis IA del equipo
+                        </a>
+                    </div>
+                {% endif %}
             </div>
             
             <!-- Criaturas del equipo -->
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-grid-3x3-gap-fill"></i> Criaturas del Equipo</h5>
+                        {% if is_owner and team.get_creature_count < 6 %}
+                            <a href="{% url 'team_add_creature' team.id %}" class="btn btn-light btn-sm">
+                                <i class="bi bi-plus-circle"></i> Añadir criatura
+                            </a>
+                        {% endif %}
                     </div>
                     <div class="card-body">
                         {% if team_creatures %}
@@ -77,7 +90,20 @@
                                                         <span class="badge bg-primary">#{{ team_creature.position }}</span>
                                                         {{ team_creature.creature.name }}
                                                     </h6>
-                                                    <span class="badge bg-info">{{ team_creature.creature.get_types_display }}</span>
+                                                    <div>
+                                                        <span class="badge bg-info">{{ team_creature.creature.get_types_display }}</span>
+                                                        {% if is_owner %}
+                                                        <form method="post"
+                                                              action="{% url 'team_remove_creature' team.id team_creature.id %}"
+                                                              class="d-inline"
+                                                              onsubmit="return confirm('¿Quitar {{ team_creature.creature.name }} del equipo?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm ms-1" title="Quitar del equipo">
+                                                                <i class="bi bi-x-lg"></i>
+                                                            </button>
+                                                        </form>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
                                                 <hr>
                                                 <div class="row text-center">
@@ -105,10 +131,10 @@
                             </div>
                         {% else %}
                             <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle-fill"></i> 
+                                <i class="bi bi-exclamation-triangle-fill"></i>
                                 Este equipo aún no tiene criaturas asignadas.
                                 {% if is_owner %}
-                                    <a href="#" class="alert-link">Añadir criaturas</a> (próximamente).
+                                    <a href="{% url 'team_add_creature' team.id %}" class="alert-link">Añadir criaturas</a>.
                                 {% endif %}
                             </div>
                         {% endif %}

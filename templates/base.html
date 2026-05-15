@@ -49,14 +49,27 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'battle_setup' %}">
                                 <i class="bi bi-lightning-fill"></i> Combates
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'creature_list' %}">
                                 <i class="bi bi-grid-3x3-gap-fill"></i> Criaturas
                             </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-robot"></i> Asesor IA
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'ai_recommendation' %}">
+                                    <i class="bi bi-magic"></i> Nueva recomendación
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'ai_history' %}">
+                                    <i class="bi bi-clock-history"></i> Historial
+                                </a></li>
+                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">

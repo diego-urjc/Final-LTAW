@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-clock-history"></i> Historial de Recomendaciones IA</h2>
+        <a href="{% url 'ai_recommendation' %}" class="btn btn-primary">
+            <i class="bi bi-magic"></i> Nueva recomendación
+        </a>
+    </div>
+
+    {% if history %}
+        <div class="accordion" id="aiHistoryAccordion">
+            {% for item in history %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ item.id }}">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse-{{ item.id }}"
+                            aria-expanded="false"
+                            aria-controls="collapse-{{ item.id }}">
+                        <span class="badge bg-info me-2">{{ item.get_context_display }}</span>
+                        <strong class="me-2">
+                            {% if item.team %}{{ item.team.name }}{% elif item.creature %}{{ item.creature.name }}{% else %}Consulta{% endif %}
+                        </strong>
+                        <span class="text-muted small ms-auto me-2">{{ item.created_at|date:"d/m/Y H:i" }}</span>
+                    </button>
+                </h2>
+                <div id="collapse-{{ item.id }}" class="accordion-collapse collapse"
+                     aria-labelledby="heading-{{ item.id }}"
+                     data-bs-parent="#aiHistoryAccordion">
+                    <div class="accordion-body">
+                        <div class="card bg-light">
+                            <div class="card-body" style="white-space: pre-wrap;">{{ item.recommendation }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Aún no has solicitado recomendaciones a la IA.
+            <a href="{% url 'ai_recommendation' %}" class="alert-link">Solicita una ahora</a>.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

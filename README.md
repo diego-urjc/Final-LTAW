@@ -6,8 +6,8 @@
 * Titulación: Grado en Ingeniería en Sistemas Audiovisuales y Multimedia
 * Cuenta en laboratorios: dlucas
 * Cuenta URJC: d.lucas.2021
-* Vídeo básico (URL):
-* Vídeo parte opcional (URL):
+* Vídeo básico (URL): https://youtu.be/8P7VoI3fGGE
+* Vídeo parte opcional (URL): https://youtu.be/BZdb4vySO_g
 * Despliegue (URL): https://final-ltaw.onrender.com
 * Usuarios y contraseñas: user / password123
 * Cuenta Admin Site: admin / admin123
@@ -24,8 +24,7 @@
 * `/login/` — Inicio de sesión
   * Métodos permitidos: GET, POST
 * `/logout/` — Cierre de sesión
-  * Métodos permitidos: POST
-* `/register/` — Registro de nuevos usuarios
+  * Métodos permitidos: POST* `/register/` — Registro de nuevos usuarios
   * Métodos permitidos: GET, POST
 * `/creatures/` — Catálogo público de pokémon
   * Métodos permitidos: GET
@@ -104,7 +103,6 @@ Todas las fases del desarrollo están documentadas paso a paso en el archivo `FA
   * Pruebas de vistas protegidas (`ProtectedViewTests`)
   * Pruebas del sistema de combate (`CombatSystemTests`)
   * Pruebas de la API REST (`APITests`)
-
   Se ejecutan con `python3 manage.py test myapp`.
 * **Integración con múltiples APIs externas en paralelo**:
   * **NVIDIA Build API** (`myapp/services/nvidia_service.py`): servicio aislado `NVIDIABuildService` con manejo de errores robusto, configuración mediante `.env` y persistencia de respuestas en el modelo `AIMessage`.

@@ -1,0 +1,270 @@
+/* Custom styles for PocketArena */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image: url('../img/ash-charizard.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+
+
+main {
+    flex: 1;
+}
+
+/* === Fondo oscuro translúcido reutilizable === */
+.dark-gradient,
+.navbar.bg-primary,
+footer.bg-dark {
+    background: rgba(0, 0, 0, .78) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Wrapper translúcido de la home: envuelve hero + cards + stats */
+.home-wrapper {
+    background: rgba(0, 0, 0, .45) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, .35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    padding: 2rem 2rem 1.5rem;
+    border-radius: 1rem;
+}
+
+/* El hero ya no necesita fondo propio: hereda el del wrapper */
+.hero-section {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: #fff !important;
+}
+
+/* Hover Pikachu en navbar */
+.navbar.bg-primary .nav-link,
+.navbar.bg-primary .navbar-brand,
+.navbar.bg-primary .dropdown-item {
+    transition: color .15s ease-in-out, background-color .15s ease-in-out;
+}
+.navbar.bg-primary .nav-link:hover,
+.navbar.bg-primary .nav-link:focus,
+.navbar.bg-primary .navbar-brand:hover,
+.navbar.bg-primary .navbar-brand:focus,
+.navbar.bg-primary .dropdown-toggle:hover,
+.navbar.bg-primary .dropdown-toggle:focus {
+    color: #ffcb05 !important;
+    text-shadow: 0 0 6px rgba(255, 203, 5, .5);
+}
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: #ffcb05;
+    color: #1a1a1a !important;
+}
+
+/* Títulos de página (h1/h2 con icono al inicio de cada sección) */
+.page-title,
+main h1:not(.alert-heading),
+main h2:not(.alert-heading):not(.accordion-header) {
+    background: linear-gradient(135deg, rgba(0, 0, 0, .85) 0%, rgba(20, 20, 20, .7) 50%, rgba(0, 0, 0, .85) 100%);
+    color: #fff;
+    padding: .6rem 1rem;
+    border-radius: .5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* El h1 del hero NO debe tener pastilla extra: hereda el fondo del hero */
+.hero-section h1 {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    display: inline-block;
+}
+
+/* Hero de la home */
+.hero-section {
+    padding: 2.5rem 1.5rem;
+    border-radius: 1rem;
+}
+.hero-section h1,
+.hero-section .text-primary,
+.hero-section .text-muted {
+    color: #fff !important;
+}
+
+/* Footer compacto */
+footer.bg-dark {
+    padding: .75rem 0 !important;
+    margin-top: auto;
+}
+
+/* Navbar brand */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Creature type badges */
+.badge[class*="type-"] {
+    color: #fff !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,.35);
+    font-weight: 600;
+    letter-spacing: .3px;
+    text-transform: capitalize;
+    padding: .35em .6em;
+}
+.type-fire { background-color: #f08030; }
+.type-water { background-color: #6890f0; }
+.type-grass { background-color: #78c850; }
+.type-electric { background-color: #f8d030; }
+.type-psychic { background-color: #f85888; }
+.type-ice { background-color: #98d8d8; }
+.type-dragon { background-color: #7038f8; }
+.type-dark { background-color: #705848; }
+.type-fairy { background-color: #ee99ac; }
+.type-normal { background-color: #a8a878; }
+.type-fighting { background-color: #c03028; }
+.type-flying { background-color: #a890f0; }
+.type-poison { background-color: #a040a0; }
+.type-ground { background-color: #e0c068; }
+.type-rock { background-color: #b8a038; }
+.type-bug { background-color: #a8b820; }
+.type-ghost { background-color: #705898; }
+.type-steel { background-color: #b8b8d0; }
+
+/* Sprite de pokémon en listado */
+.creature-sprite {
+    width: 70px !important;
+    height: 70px !important;
+    max-width: 70px !important;
+    max-height: 70px !important;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+    transition: transform .2s ease;
+    display: inline-block;
+}
+.creature-card-list:hover .creature-sprite {
+    transform: scale(1.08);
+}
+.creature-sprite-placeholder {
+    width: 70px;
+    height: 70px;
+    background: #e9ecef;
+    border-radius: 50%;
+}
+
+/* Battle arena styles */
+.battle-arena {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+}
+
+.creature-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.health-bar {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.health-fill {
+    background: linear-gradient(90deg, #dc3545, #ffc107, #198754);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* Team builder styles */
+.team-slot {
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.team-slot:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.team-slot.filled {
+    border-style: solid;
+    border-color: var(--success-color);
+}
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .battle-arena {
+        padding: 1rem;
+    }
+    
+    .creature-card {
+        margin-bottom: 1rem;
+    }
+}

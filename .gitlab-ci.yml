@@ -1,0 +1,28 @@
+image: python:3.11
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
+pages:
+  stage: deploy
+  script:
+    - source venv/bin/activate
+    - python manage.py collectstatic --noinput
+    - mkdir -p public
+    - cp -r static/* public/
+    - cp -r templates public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

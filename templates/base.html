@@ -93,10 +93,21 @@
                                 <li><a class="dropdown-item" href="#">
                                     <i class="bi bi-gear"></i> Configuración
                                 </a></li>
+                                {% if user.is_staff or user.is_superuser %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">
-                                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="bi bi-shield-lock-fill"></i> Panel Django Admin
                                 </a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
@@ -135,31 +146,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="bi bi-trophy-fill"></i> PocketArena</h5>
-                    <p>Simulador web de combates por turnos inspirado en Pokémon Showdown</p>
-                </div>
-                <div class="col-md-6">
-                    <h5>Enlaces Rápidos</h5>
-                    <ul class="list-unstyled">
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'my_teams' %}" class="text-light">Mis Equipos</a></li>
-                            <li><a href="{% url 'team_list' %}" class="text-light">Equipos Públicos</a></li>
-                            <li><a href="#" class="text-light">Historial de Combates</a></li>
-                        {% else %}
-                            <li><a href="{% url 'team_list' %}" class="text-light">Equipos Públicos</a></li>
-                        {% endif %}
-                        <li><a href="{% url 'admin:index' %}" class="text-light">Administración</a></li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="bg-light">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2024 PocketArena. Proyecto final de asignatura.</p>
-            </div>
+    <footer class="bg-dark text-light mt-auto">
+        <div class="container text-center">
+            <small><i class="bi bi-trophy-fill"></i> &copy; 2026 PocketArena. Proyecto final de asignatura.</small>
         </div>
     </footer>
 

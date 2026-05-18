@@ -1,0 +1,192 @@
+<div id="battle-content">
+    <!-- Escena de combate estilo Showdown -->
+    <div class="battle-scene mb-3">
+        <!-- Mini-cards equipo jugador (izquierda) -->
+        <div class="team-roster team-roster-left">
+            {% for slot in team1_slots %}
+                <div class="mini-card {% if slot.fainted %}fainted{% endif %} {% if slot.is_active %}active{% endif %}"
+                     title="{{ slot.creature.name }} - HP {{ slot.hp_current }}/{{ slot.hp_max }}">
+                    {% if slot.creature.image_url %}
+                        <img src="{{ slot.creature.image_url }}" alt="{{ slot.creature.name }}">
+                    {% endif %}
+                    {% if slot.fainted %}<i class="bi bi-x-lg mini-x"></i>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Mini-cards equipo rival (derecha) -->
+        <div class="team-roster team-roster-right">
+            {% for slot in team2_slots %}
+                <div class="mini-card {% if slot.fainted %}fainted{% endif %} {% if slot.is_active %}active{% endif %}"
+                     title="{{ slot.creature.name }} - HP {{ slot.hp_current }}/{{ slot.hp_max }}">
+                    {% if slot.creature.image_url %}
+                        <img src="{{ slot.creature.image_url }}" alt="{{ slot.creature.name }}">
+                    {% endif %}
+                    {% if slot.fainted %}<i class="bi bi-x-lg mini-x"></i>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="battle-creature battle-enemy">
+            {% if creature2.image_url %}
+                <img src="{{ creature2.image_url }}" alt="{{ creature2.name }}">
+            {% endif %}
+            <div class="battle-platform"></div>
+        </div>
+        <div class="battle-creature battle-player">
+            {% if creature1.image_url %}
+                <img src="{{ creature1.image_url }}" alt="{{ creature1.name }}">
+            {% endif %}
+            <div class="battle-platform"></div>
+        </div>
+    </div>
+
+    <!-- HP / Stats -->
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <div class="card border-primary border-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person"></i> {{ creature1.name }}
+                        <span class="badge bg-light text-dark ms-2">¡Tu criatura!</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">HP</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar hp-bar {{ hp1_color }}"
+                                 role="progressbar"
+                                 style="width: {{ hp1_percent_prev|default:hp1_percent }}%"
+                                 data-target="{% if hp1_percent < 0 %}0{% elif hp1_percent > 100 %}100{% else %}{{ hp1_percent }}{% endif %}"
+                                 aria-valuenow="{{ creature1_hp }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="{{ creature1.hp }}">
+                                {{ creature1_hp }}/{{ creature1.hp }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4"><strong>ATK:</strong> {{ creature1.attack }}</div>
+                        <div class="col-4"><strong>DEF:</strong> {{ creature1.defense }}</div>
+                        <div class="col-4"><strong>SPD:</strong> {{ creature1.speed }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-center justify-content-center">
+            <h1 class="text-danger">VS</h1>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card border-warning border-3">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-robot"></i> {{ creature2.name }} (IA)
+                        <span class="badge bg-dark text-white ms-2">¡Rival!</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">HP</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar hp-bar {{ hp2_color }}"
+                                 role="progressbar"
+                                 style="width: {{ hp2_percent_prev|default:hp2_percent }}%"
+                                 data-target="{% if hp2_percent < 0 %}0{% elif hp2_percent > 100 %}100{% else %}{{ hp2_percent }}{% endif %}"
+                                 aria-valuenow="{{ creature2_hp }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="{{ creature2.hp }}">
+                                {{ creature2_hp }}/{{ creature2.hp }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4"><strong>ATK:</strong> {{ creature2.attack }}</div>
+                        <div class="col-4"><strong>DEF:</strong> {{ creature2.defense }}</div>
+                        <div class="col-4"><strong>SPD:</strong> {{ creature2.speed }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de movimiento -->
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-lightning"></i> Selecciona un Movimiento</h5>
+        </div>
+        <div class="card-body">
+            <form hx-post="{% url 'battle_turn' %}"
+                  hx-target="#battle-content"
+                  hx-swap="outerHTML"
+                  hx-indicator="#battle-indicator">
+                {% csrf_token %}
+                <div class="row">
+                    {% for cm in creature_moves %}
+                    <div class="col-md-3 mb-3">
+                        <button type="submit" name="move" value="{{ cm.move.id }}"
+                                class="btn btn-outline-primary w-100 h-100 text-start">
+                            <div>
+                                <strong>{{ cm.move.name }}</strong>
+                                <span class="badge type-{{ cm.move.type }} float-end">{{ cm.move.get_type_display }}</span>
+                            </div>
+                            <div class="small text-muted">
+                                Poder: {{ cm.move.power|default:"-" }} |
+                                Precisión: {{ cm.move.accuracy|default:"-" }}%
+                            </div>
+                        </button>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Esta criatura no tiene movimientos disponibles.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="battle-indicator" class="htmx-indicator text-center text-muted">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    Procesando turno...
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Log del combate -->
+    <div class="card bg-light">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historial del Combate</h5>
+        </div>
+        <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+            {% for entry in log %}
+                {% if entry.event %}
+                    <div class="alert alert-secondary py-2 mb-2">
+                        <strong>Turno {{ entry.turn }}:</strong> {{ entry.event }}
+                    </div>
+                {% else %}
+                    <div class="alert {% if entry.player == 1 %}alert-primary{% else %}alert-warning{% endif %} py-2 mb-2">
+                        <strong>Turno {{ entry.turn }}:</strong>
+                        {{ entry.creature }} usó {{ entry.move }} y causó {{ entry.damage }} de daño a {{ entry.target }}.
+                        (HP restante: {{ entry.target_hp }})
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p class="text-muted text-center">El combate acaba de iniciar.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    // Anima cada barra HP desde su valor actual (style.width = previo)
+    // hasta el data-target. La CSS transition hace el resto.
+    requestAnimationFrame(function () {
+        document.querySelectorAll('#battle-content .hp-bar[data-target]').forEach(function (bar) {
+            bar.style.width = bar.dataset.target + '%';
+        });
+    });
+})();
+</script>

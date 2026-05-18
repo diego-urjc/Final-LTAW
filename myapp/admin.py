@@ -11,18 +11,28 @@ class CreatureAdmin(admin.ModelAdmin):
     """Administración de Criaturas"""
     
     list_display = [
-        'name', 'get_types_display', 'hp', 'attack', 'defense', 
-        'speed', 'sp_attack', 'sp_defense', 'created_at'
+        'pokemon_id', 'sprite_preview', 'name', 'get_types_display',
+        'hp', 'attack', 'defense', 'speed', 'sp_attack', 'sp_defense', 'created_at'
     ]
+    list_display_links = ['name']
     list_filter = ['type1', 'type2', 'created_at', 'updated_at']
-    search_fields = ['name', 'description']
+    search_fields = ['name', 'description', 'pokemon_id']
     ordering = ['name']
     date_hierarchy = 'created_at'
     list_per_page = 25
+
+    def sprite_preview(self, obj):
+        if obj.image_url:
+            return format_html(
+                '<img src="{}" style="width:48px;height:48px;object-fit:contain;" />',
+                obj.image_url,
+            )
+        return '-'
+    sprite_preview.short_description = 'Sprite'
     
     fieldsets = (
         ('Información Básica', {
-            'fields': ('name', 'type1', 'type2', 'description', 'image_url')
+            'fields': ('name', 'pokemon_id', 'type1', 'type2', 'description', 'image_url')
         }),
         ('Estadísticas Básicas', {
             'fields': ('hp', 'attack', 'defense', 'speed')

@@ -2,15 +2,15 @@
 
 ## Datos
 
-* Nombre:
-* Titulación:
-* Cuenta en laboratorios:
-* Cuenta URJC:
+* Nombre: Diego Lucas Luis
+* Titulación: Grado en Ingeniería en Sistemas Audiovisuales y Multimedia
+* Cuenta en laboratorios: dlucas
+* Cuenta URJC: d.lucas.2021
 * Vídeo básico (URL):
 * Vídeo parte opcional (URL):
-* Despliegue (URL):
-* Usuarios y contraseñas:
-* Cuenta Admin Site: usuario/contraseña
+* Despliegue (URL): 
+* Usuarios y contraseñas: user / password123
+* Cuenta Admin Site: admin / admin123
 
 ## Recursos y métodos HTTP
 

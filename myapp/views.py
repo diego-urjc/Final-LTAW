@@ -1,5 +1,6 @@
 import random
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -454,22 +455,36 @@ def _team_finished(hps):
     return all(h <= 0 for h in hps)
 
 
+def _is_htmx(request):
+    return request.headers.get('HX-Request') == 'true'
+
+
 @login_required
 def battle_turn(request):
-    """Procesa cada turno del combate estilo Pokémon (formato team-based)."""
+    """Procesa cada turno del combate estilo Pokémon (formato team-based).
+
+    Si la petición es HTMX (`HX-Request: true`) se devuelve solo el partial
+    `_battle_content.html` para hacer swap parcial sin recargar la página.
+    """
     battle = request.session.get('battle')
 
     if not battle:
+        if _is_htmx(request):
+            return HttpResponse(status=204, headers={'HX-Redirect': '/battle/'})
         messages.error(request, 'No hay ningún combate activo.')
         return redirect('battle_setup')
 
     if battle.get('finished'):
+        if _is_htmx(request):
+            return HttpResponse(status=204, headers={'HX-Redirect': '/battle/result/'})
         return redirect('battle_result')
 
     if _team_finished(battle['hp1']) or _team_finished(battle['hp2']):
         battle['finished'] = True
         battle['winner'] = 2 if _team_finished(battle['hp1']) else 1
         request.session['battle'] = battle
+        if _is_htmx(request):
+            return HttpResponse(status=204, headers={'HX-Redirect': '/battle/result/'})
         return redirect('battle_result')
 
     creature1 = get_object_or_404(Creature, id=battle['team1'][battle['active1']])
@@ -486,104 +501,125 @@ def battle_turn(request):
         .order_by('level_learned')
     )
 
+    # HP previo para animar la transición en el cliente.
+    prev_active1 = battle['active1']
+    prev_active2 = battle['active2']
+    prev_hp1 = battle['hp1'][prev_active1]
+    prev_hp2 = battle['hp2'][prev_active2]
+
     if request.method == 'POST':
         move_id = request.POST.get('move')
-        if not move_id:
-            messages.error(request, 'Debes seleccionar un movimiento.')
-            return redirect('battle_turn')
+        if move_id:
+            player_cm = get_object_or_404(player_moves, move_id=move_id)
+            player_move_obj = player_cm.move
 
-        player_cm = get_object_or_404(player_moves, move_id=move_id)
-        player_move_obj = player_cm.move
+            ai_cm = random.choice(list(ai_moves)) if ai_moves.exists() else None
+            ai_move_obj = ai_cm.move if ai_cm else None
 
-        ai_cm = random.choice(list(ai_moves)) if ai_moves.exists() else None
-        ai_move_obj = ai_cm.move if ai_cm else None
-
-        if creature1.speed > creature2.speed:
-            order = [1, 2]
-        elif creature2.speed > creature1.speed:
-            order = [2, 1]
-        else:
-            order = random.choice([[1, 2], [2, 1]])
-
-        attacks = []
-        for attacker in order:
-            if attacker == 1:
-                if battle['hp1'][battle['active1']] <= 0:
-                    continue
-                dmg = player_move_obj.power if player_move_obj.power else 20
-                battle['hp2'][battle['active2']] -= dmg
-                battle['log'].append({
-                    'turn': battle['turn'],
-                    'player': 1,
-                    'creature': creature1.name,
-                    'move': player_move_obj.name,
-                    'damage': dmg,
-                    'target': creature2.name,
-                    'target_hp': max(battle['hp2'][battle['active2']], 0),
-                })
-                attacks.append(f'{creature1.name} usó {player_move_obj.name} y causó {dmg} de daño.')
+            if creature1.speed > creature2.speed:
+                order = [1, 2]
+            elif creature2.speed > creature1.speed:
+                order = [2, 1]
             else:
-                if not ai_move_obj or battle['hp2'][battle['active2']] <= 0:
-                    continue
-                dmg = ai_move_obj.power if ai_move_obj.power else 20
-                battle['hp1'][battle['active1']] -= dmg
-                battle['log'].append({
-                    'turn': battle['turn'],
-                    'player': 2,
-                    'creature': creature2.name,
-                    'move': ai_move_obj.name,
-                    'damage': dmg,
-                    'target': creature1.name,
-                    'target_hp': max(battle['hp1'][battle['active1']], 0),
-                })
-                attacks.append(f'{creature2.name} (IA) usó {ai_move_obj.name} y causó {dmg} de daño.')
+                order = random.choice([[1, 2], [2, 1]])
 
-        # Relevos automáticos al final del turno
-        if battle['hp1'][battle['active1']] <= 0:
-            attacks.append(f'¡{creature1.name} ha caído!')
-            next_idx = next(
-                (i for i, hp in enumerate(battle['hp1']) if hp > 0 and i > battle['active1']),
-                None,
-            )
-            if next_idx is None:
-                next_idx = next((i for i, hp in enumerate(battle['hp1']) if hp > 0), None)
-            if next_idx is not None:
-                battle['active1'] = next_idx
-                next_creature = Creature.objects.get(id=battle['team1'][next_idx])
-                attacks.append(f'¡Adelante, {next_creature.name}!')
+            for attacker in order:
+                if attacker == 1:
+                    if battle['hp1'][battle['active1']] <= 0:
+                        continue
+                    dmg = player_move_obj.power if player_move_obj.power else 20
+                    battle['hp2'][battle['active2']] -= dmg
+                    battle['log'].append({
+                        'turn': battle['turn'],
+                        'player': 1,
+                        'creature': creature1.name,
+                        'move': player_move_obj.name,
+                        'damage': dmg,
+                        'target': creature2.name,
+                        'target_hp': max(battle['hp2'][battle['active2']], 0),
+                    })
+                else:
+                    if not ai_move_obj or battle['hp2'][battle['active2']] <= 0:
+                        continue
+                    dmg = ai_move_obj.power if ai_move_obj.power else 20
+                    battle['hp1'][battle['active1']] -= dmg
+                    battle['log'].append({
+                        'turn': battle['turn'],
+                        'player': 2,
+                        'creature': creature2.name,
+                        'move': ai_move_obj.name,
+                        'damage': dmg,
+                        'target': creature1.name,
+                        'target_hp': max(battle['hp1'][battle['active1']], 0),
+                    })
 
-        if battle['hp2'][battle['active2']] <= 0:
-            attacks.append(f'¡{creature2.name} (IA) ha caído!')
-            next_idx = next(
-                (i for i, hp in enumerate(battle['hp2']) if hp > 0 and i > battle['active2']),
-                None,
-            )
-            if next_idx is None:
-                next_idx = next((i for i, hp in enumerate(battle['hp2']) if hp > 0), None)
-            if next_idx is not None:
-                battle['active2'] = next_idx
-                next_creature = Creature.objects.get(id=battle['team2'][next_idx])
-                attacks.append(f'El rival envía a {next_creature.name}.')
+            # Relevos automáticos al final del turno (añadidos al log como eventos)
+            if battle['hp1'][battle['active1']] <= 0:
+                battle['log'].append({'turn': battle['turn'],
+                                      'event': f'¡{creature1.name} ha caído!'})
+                next_idx = next(
+                    (i for i, hp in enumerate(battle['hp1']) if hp > 0 and i > battle['active1']),
+                    None,
+                )
+                if next_idx is None:
+                    next_idx = next((i for i, hp in enumerate(battle['hp1']) if hp > 0), None)
+                if next_idx is not None:
+                    battle['active1'] = next_idx
+                    next_creature = Creature.objects.get(id=battle['team1'][next_idx])
+                    battle['log'].append({'turn': battle['turn'],
+                                          'event': f'¡Adelante, {next_creature.name}!'})
 
-        battle['turn'] += 1
+            if battle['hp2'][battle['active2']] <= 0:
+                battle['log'].append({'turn': battle['turn'],
+                                      'event': f'¡{creature2.name} (IA) ha caído!'})
+                next_idx = next(
+                    (i for i, hp in enumerate(battle['hp2']) if hp > 0 and i > battle['active2']),
+                    None,
+                )
+                if next_idx is None:
+                    next_idx = next((i for i, hp in enumerate(battle['hp2']) if hp > 0), None)
+                if next_idx is not None:
+                    battle['active2'] = next_idx
+                    next_creature = Creature.objects.get(id=battle['team2'][next_idx])
+                    battle['log'].append({'turn': battle['turn'],
+                                          'event': f'El rival envía a {next_creature.name}.'})
 
-        if _team_finished(battle['hp1']) or _team_finished(battle['hp2']):
-            battle['finished'] = True
-            battle['winner'] = 2 if _team_finished(battle['hp1']) else 1
+            battle['turn'] += 1
             request.session['battle'] = battle
-            for msg in attacks:
-                messages.info(request, msg)
-            return redirect('battle_result')
 
-        request.session['battle'] = battle
-        for msg in attacks:
-            messages.info(request, msg)
-        return redirect('battle_turn')
+            if _team_finished(battle['hp1']) or _team_finished(battle['hp2']):
+                battle['finished'] = True
+                battle['winner'] = 2 if _team_finished(battle['hp1']) else 1
+                request.session['battle'] = battle
+                if _is_htmx(request):
+                    return HttpResponse(status=204, headers={'HX-Redirect': '/battle/result/'})
+                return redirect('battle_result')
+
+            # Tras procesar, recargamos las criaturas activas (pueden haber cambiado
+            # por relevo automático).
+            creature1 = Creature.objects.get(id=battle['team1'][battle['active1']])
+            creature2 = Creature.objects.get(id=battle['team2'][battle['active2']])
+            player_moves = (
+                CreatureMove.objects.filter(creature=creature1)
+                .select_related('move')
+                .order_by('level_learned')
+            )
 
     hp1_current = battle['hp1'][battle['active1']]
     hp2_current = battle['hp2'][battle['active2']]
     hp1_percent = (hp1_current / creature1.hp) * 100 if creature1.hp else 0
     hp2_percent = (hp2_current / creature2.hp) * 100 if creature2.hp else 0
+
+    # Si hubo relevo automático, el "previo" no tiene sentido: arrancamos
+    # la barra al 100 para que se vea como un pokémon nuevo saliendo.
+    if battle['active1'] != prev_active1:
+        hp1_percent_prev = 100
+    else:
+        hp1_percent_prev = (prev_hp1 / creature1.hp) * 100 if creature1.hp else 0
+    if battle['active2'] != prev_active2:
+        hp2_percent_prev = 100
+    else:
+        hp2_percent_prev = (prev_hp2 / creature2.hp) * 100 if creature2.hp else 0
 
     context = {
         'title': 'Combate en Curso - PocketArena',
@@ -596,13 +632,16 @@ def battle_turn(request):
         'creature2_hp': max(hp2_current, 0),
         'hp1_percent': hp1_percent,
         'hp2_percent': hp2_percent,
+        'hp1_percent_prev': hp1_percent_prev,
+        'hp2_percent_prev': hp2_percent_prev,
         'hp1_color': _hp_color(hp1_percent),
         'hp2_color': _hp_color(hp2_percent),
         'creature_moves': player_moves,
         'team1_slots': _team_view(battle['team1'], battle['hp1'], battle['active1']),
         'team2_slots': _team_view(battle['team2'], battle['hp2'], battle['active2']),
     }
-    return render(request, 'battles/battle_arena.html', context)
+    template = 'battles/_battle_content.html' if _is_htmx(request) else 'battles/battle_arena.html'
+    return render(request, template, context)
 
 
 @login_required
@@ -826,6 +865,87 @@ def get_ai_recommendation(request):
         'preselected_context': preselected_context,
     }
     return render(request, 'ai/recommendation_form.html', context)
+
+
+# ====================================================================== #
+#  API REST (JsonResponse) - sin Django REST Framework                    #
+# ====================================================================== #
+
+
+def api_creatures_list(request):
+    """GET /api/creatures/ -> listado serializado de criaturas."""
+    creatures = Creature.objects.all().order_by('name')
+    data = [
+        {
+            'id': c.id,
+            'name': c.name,
+            'pokemon_id': c.pokemon_id,
+            'type1': c.type1,
+            'type2': c.type2,
+            'hp': c.hp,
+            'attack': c.attack,
+            'defense': c.defense,
+            'speed': c.speed,
+        }
+        for c in creatures
+    ]
+    return JsonResponse({'creatures': data, 'total': len(data)})
+
+
+def api_creature_detail(request, creature_id):
+    """GET /api/creatures/<id>/ -> detalle con movimientos."""
+    try:
+        creature = Creature.objects.prefetch_related('moves').get(id=creature_id)
+    except Creature.DoesNotExist:
+        return JsonResponse({'error': 'Creature not found'}, status=404)
+
+    moves = [
+        {
+            'id': m.id,
+            'name': m.name,
+            'type': m.type,
+            'power': m.power,
+            'accuracy': m.accuracy,
+        }
+        for m in creature.moves.all()
+    ]
+    payload = {
+        'id': creature.id,
+        'name': creature.name,
+        'pokemon_id': creature.pokemon_id,
+        'type1': creature.type1,
+        'type2': creature.type2,
+        'hp': creature.hp,
+        'attack': creature.attack,
+        'defense': creature.defense,
+        'speed': creature.speed,
+        'sp_attack': creature.sp_attack,
+        'sp_defense': creature.sp_defense,
+        'moves': moves,
+    }
+    return JsonResponse(payload)
+
+
+def api_teams_list(request):
+    """GET /api/teams/ -> equipos públicos."""
+    teams = (
+        Team.objects.filter(is_public=True)
+        .select_related('user')
+        .annotate(creatures_count=Count('creatures'))
+        .order_by('-updated_at')
+    )
+    data = [
+        {
+            'id': t.id,
+            'name': t.name,
+            'user': t.user.username,
+            'created_at': t.created_at.isoformat(),
+            'updated_at': t.updated_at.isoformat(),
+            'creatures_count': t.creatures_count,
+        }
+        for t in teams
+    ]
+    return JsonResponse({'teams': data, 'total': len(data)})
 
 
 @login_required

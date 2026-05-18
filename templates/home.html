@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-8 mx-auto text-center">
+    <div class="col-lg-8 mx-auto text-center home-wrapper">
         <!-- Hero Section -->
         <div class="hero-section mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-4">
-                <i class="bi bi-trophy-fill"></i> PocketArena
-            </h1>
+            <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mb-4">
+                <h1 class="display-4 fw-bold text-primary mb-0">
+                    <i class="bi bi-trophy-fill"></i> PocketArena
+                </h1>
+                <img src="{% static 'img/pikachu.png' %}" alt="Pikachu" class="hero-pikachu">
+
+            </div>
             <p class="lead mb-4">
                 {{ description }}
             </p>
@@ -126,4 +131,25 @@
         </div>
     </div>
 </div>
+
+<style>
+.hero-pikachu {
+    width: 110px;
+    height: auto;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
+    animation: pikachu-bounce 1.4s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+@keyframes pikachu-bounce {
+    0%   { transform: translateY(0)    rotate(-3deg); }
+    50%  { transform: translateY(-10px) rotate(3deg); }
+    100% { transform: translateY(0)    rotate(-3deg); }
+}
+
+.hero-pikachu:hover {
+    animation-duration: .6s;
+}
+</style>
 {% endblock %}

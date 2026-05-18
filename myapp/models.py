@@ -30,6 +30,11 @@ class Creature(models.Model):
     ]
     
     name = models.CharField(max_length=100, unique=True, verbose_name="Nombre")
+    pokemon_id = models.PositiveIntegerField(
+        unique=True, null=True, blank=True,
+        verbose_name="ID PokéAPI",
+        help_text="Identificador en PokéAPI (vacío para criaturas custom)."
+    )
     type1 = models.CharField(max_length=20, choices=TYPE_CHOICES, verbose_name="Tipo Principal")
     type2 = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True, verbose_name="Tipo Secundario")
     

@@ -51,4 +51,9 @@ urlpatterns = [
     # Rutas de IA
     path("ai/recommendation/", views.get_ai_recommendation, name="ai_recommendation"),
     path("ai/history/", views.ai_history, name="ai_history"),
+
+    # API REST (JsonResponse, sin DRF)
+    path("api/creatures/", views.api_creatures_list, name="api_creatures_list"),
+    path("api/creatures/<int:creature_id>/", views.api_creature_detail, name="api_creature_detail"),
+    path("api/teams/", views.api_teams_list, name="api_teams_list"),
 ]

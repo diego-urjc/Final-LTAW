@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_teams' %}">Mis Equipos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'team_detail' team.id %}">{{ team.name }}</a></li>
+            <li class="breadcrumb-item active">Añadir pokemon</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Añadir pokemon a {{ team.name }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if available_pokemons and available_positions %}
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="pokemon" class="form-label">Pokemon</label>
+                                <select class="form-select" id="pokemon" name="pokemon" required>
+                                    <option value="">-- Elige una pokemon --</option>
+                                    {% for pokemon in available_pokemons %}
+                                        <option value="{{ pokemon.id }}"
+                                                data-type="{{ pokemon.get_types_display }}"
+                                                data-hp="{{ pokemon.hp }}"
+                                                data-atk="{{ pokemon.attack }}"
+                                                data-def="{{ pokemon.defense }}"
+                                                data-spd="{{ pokemon.speed }}">
+                                            {{ pokemon.name }} ({{ pokemon.get_types_display }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div id="pokemon-preview" class="alert alert-light d-none">
+                                <strong id="preview-name"></strong>
+                                <span class="badge bg-info ms-2" id="preview-type"></span>
+                                <div class="row text-center mt-2">
+                                    <div class="col-3"><small class="text-muted">HP</small><br><strong id="preview-hp"></strong></div>
+                                    <div class="col-3"><small class="text-muted">ATK</small><br><strong id="preview-atk"></strong></div>
+                                    <div class="col-3"><small class="text-muted">DEF</small><br><strong id="preview-def"></strong></div>
+                                    <div class="col-3"><small class="text-muted">SPD</small><br><strong id="preview-spd"></strong></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="position" class="form-label">Posición en el equipo</label>
+                                <select class="form-select" id="position" name="position" required>
+                                    {% for pos in available_positions %}
+                                        <option value="{{ pos }}">Posición {{ pos }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Las posiciones ocupadas no se muestran.</div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Añadir al equipo
+                                </button>
+                                <a href="{% url 'team_detail' team.id %}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i>
+                            {% if not available_positions %}
+                                Este equipo ya tiene todas las posiciones ocupadas.
+                            {% else %}
+                                No quedan pokemons disponibles para añadir.
+                            {% endif %}
+                            <a href="{% url 'team_detail' team.id %}" class="alert-link">Volver al equipo</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if current_members %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-people-fill"></i> Pokemons actuales</h6>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for tc in current_members %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><span class="badge bg-primary me-2">#{{ tc.position }}</span>{{ tc.pokemon.name }}</span>
+                            <span class="badge bg-info">{{ tc.pokemon.get_types_display }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const select = document.getElementById('pokemon');
+    if (!select) return;
+    const preview = document.getElementById('pokemon-preview');
+    select.addEventListener('change', function () {
+        const opt = this.selectedOptions[0];
+        if (!opt || !opt.value) {
+            preview.classList.add('d-none');
+            return;
+        }
+        document.getElementById('preview-name').textContent = opt.textContent.trim();
+        document.getElementById('preview-type').textContent = opt.dataset.type;
+        document.getElementById('preview-hp').textContent = opt.dataset.hp;
+        document.getElementById('preview-atk').textContent = opt.dataset.atk;
+        document.getElementById('preview-def').textContent = opt.dataset.def;
+        document.getElementById('preview-spd').textContent = opt.dataset.spd;
+        preview.classList.remove('d-none');
+    });
+})();
+</script>
+{% endblock %}

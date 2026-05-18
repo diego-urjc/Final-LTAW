@@ -5,7 +5,7 @@ import uuid
 
 
 class Creature(models.Model):
-    """Criatura con estadísticas básicas para combate"""
+    """Pokémon con estadísticas básicas para combate"""
     
     # Tipos elementales (similar a Pokémon)
     TYPE_CHOICES = [
@@ -33,7 +33,7 @@ class Creature(models.Model):
     pokemon_id = models.PositiveIntegerField(
         unique=True, null=True, blank=True,
         verbose_name="ID PokéAPI",
-        help_text="Identificador en PokéAPI (vacío para criaturas custom)."
+        help_text="Identificador en PokéAPI (vacío para pokémon custom)."
     )
     type1 = models.CharField(max_length=20, choices=TYPE_CHOICES, verbose_name="Tipo Principal")
     type2 = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True, verbose_name="Tipo Secundario")
@@ -78,8 +78,8 @@ class Creature(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizado")
     
     class Meta:
-        verbose_name = "Criatura"
-        verbose_name_plural = "Criaturas"
+        verbose_name = "Pokémon"
+        verbose_name_plural = "Pokémon"
         ordering = ['name']
     
     def __str__(self):
@@ -161,7 +161,7 @@ class Move(models.Model):
 class CreatureMove(models.Model):
     """Modelo intermedio para relación Creature-Move con niveles"""
     
-    creature = models.ForeignKey(Creature, on_delete=models.CASCADE, verbose_name="Criatura")
+    creature = models.ForeignKey(Creature, on_delete=models.CASCADE, verbose_name="Pokémon")
     move = models.ForeignKey(Move, on_delete=models.CASCADE, verbose_name="Movimiento")
     level_learned = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100)],
@@ -169,8 +169,8 @@ class CreatureMove(models.Model):
     )
     
     class Meta:
-        verbose_name = "Movimiento de Criatura"
-        verbose_name_plural = "Movimientos de Criaturas"
+        verbose_name = "Movimiento de Pokémon"
+        verbose_name_plural = "Movimientos de Pokémon"
         unique_together = ['creature', 'move']
         ordering = ['level_learned', 'move__name']
     
@@ -179,17 +179,17 @@ class CreatureMove(models.Model):
 
 
 class Team(models.Model):
-    """Equipo de criaturas de un usuario"""
+    """Equipo de pokémon de un usuario"""
     
     name = models.CharField(max_length=100, verbose_name="Nombre del Equipo")
     description = models.TextField(blank=True, verbose_name="Descripción")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Entrenador")
     
-    # Criaturas en el equipo (Muchos a Muchos)
+    # Pokémon en el equipo (Muchos a Muchos)
     creatures = models.ManyToManyField(
         Creature, 
         through='TeamCreature',
-        verbose_name="Criaturas"
+        verbose_name="Pokémon"
     )
     
     is_public = models.BooleanField(default=False, verbose_name="Público")
@@ -205,7 +205,7 @@ class Team(models.Model):
         return f"{self.name} - {self.user.username}"
     
     def get_creature_count(self):
-        """Retorna el número de criaturas en el equipo"""
+        """Retorna el número de pokémon en el equipo"""
         return self.creatures.count()
 
 
@@ -213,15 +213,15 @@ class TeamCreature(models.Model):
     """Modelo intermedio para relación Team-Creature con posición"""
     
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name="Equipo")
-    creature = models.ForeignKey(Creature, on_delete=models.CASCADE, verbose_name="Criatura")
+    creature = models.ForeignKey(Creature, on_delete=models.CASCADE, verbose_name="Pokémon")
     position = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(6)],
         verbose_name="Posición en el equipo"
     )
     
     class Meta:
-        verbose_name = "Criatura en Equipo"
-        verbose_name_plural = "Criaturas en Equipos"
+        verbose_name = "Pokémon en Equipo"
+        verbose_name_plural = "Pokémon en Equipos"
         unique_together = ['team', 'position']
         ordering = ['position']
     
@@ -317,9 +317,9 @@ class BattleTurn(models.Model):
     damage_dealt_p1 = models.PositiveIntegerField(null=True, blank=True, verbose_name="Daño Causado por P1")
     damage_dealt_p2 = models.PositiveIntegerField(null=True, blank=True, verbose_name="Daño Causado por P2")
     
-    # Estado de las criaturas después del turno
-    p1_creature_hp = models.PositiveIntegerField(null=True, blank=True, verbose_name="HP Criatura P1")
-    p2_creature_hp = models.PositiveIntegerField(null=True, blank=True, verbose_name="HP Criatura P2")
+    # Estado de las pokémon después del turno
+    p1_creature_hp = models.PositiveIntegerField(null=True, blank=True, verbose_name="HP Pokémon P1")
+    p2_creature_hp = models.PositiveIntegerField(null=True, blank=True, verbose_name="HP Pokémon P2")
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado")
     
@@ -352,7 +352,7 @@ class AIMessage(models.Model):
     recommendation = models.TextField(verbose_name="Recomendación")
     
     # Metadatos
-    creature = models.ForeignKey(Creature, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Criatura Relacionada")
+    creature = models.ForeignKey(Creature, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Pokémon Relacionada")
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Equipo Relacionado")
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado")

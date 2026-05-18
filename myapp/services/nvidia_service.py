@@ -80,10 +80,10 @@ class NVIDIABuildService:
     def _build_team_prompt(self, creature_data: List[Dict]) -> str:
         """Construye el prompt con información del equipo"""
         prompt = "Eres un experto en estrategia de combate estilo Pokémon. "
-        prompt += "Analiza el siguiente equipo de criaturas y da recomendaciones estratégicas:\n\n"
+        prompt += "Analiza el siguiente equipo de pokémon y da recomendaciones estratégicas:\n\n"
         
         for i, creature in enumerate(creature_data, 1):
-            prompt += f"Criatura {i}: {creature['name']}\n"
+            prompt += f"Pokémon {i}: {creature['name']}\n"
             prompt += f"  - Tipo: {creature['type']}\n"
             prompt += f"  - HP: {creature['hp']}, ATK: {creature['attack']}, DEF: {creature['defense']}\n"
             prompt += f"  - SPD: {creature['speed']}, SP.ATK: {creature['sp_attack']}, SP.DEF: {creature['sp_defense']}\n"
@@ -96,9 +96,9 @@ class NVIDIABuildService:
         return prompt
     
     def get_team_recommendations(self, creature_data: List[Dict]) -> Optional[str]:
-        """Obtiene recomendaciones estratégicas para un equipo de criaturas."""
+        """Obtiene recomendaciones estratégicas para un equipo de pokémon."""
         if not creature_data:
-            logger.warning("get_team_recommendations llamado sin criaturas")
+            logger.warning("get_team_recommendations llamado sin pokémon")
             return None
         prompt = self._build_team_prompt(creature_data)
         return self._call_chat(prompt, max_tokens=500)
@@ -108,8 +108,8 @@ class NVIDIABuildService:
         Obtiene recomendación para un combate específico
         
         Args:
-            player_creature: Diccionario con información de la criatura del jugador
-            enemy_creature: Diccionario con información de la criatura enemiga
+            player_creature: Diccionario con información de la pokémon del jugador
+            enemy_creature: Diccionario con información de la pokémon enemiga
         
         Returns:
             String con recomendación o None si hay error
@@ -117,12 +117,12 @@ class NVIDIABuildService:
         prompt = (
             "Eres un experto en combate estilo Pokémon. "
             "Analiza este enfrentamiento y da una recomendación estratégica:\n\n"
-            f"Tu criatura: {player_creature['name']}\n"
+            f"Tu pokémon: {player_creature['name']}\n"
             f"  - Tipo: {player_creature['type']}\n"
             f"  - HP: {player_creature['hp']}, ATK: {player_creature['attack']}, DEF: {player_creature['defense']}\n"
             f"  - SPD: {player_creature['speed']}\n"
             f"  - Movimientos: {', '.join(player_creature['moves'])}\n\n"
-            f"Criatura enemiga: {enemy_creature['name']}\n"
+            f"Pokémon enemiga: {enemy_creature['name']}\n"
             f"  - Tipo: {enemy_creature['type']}\n"
             f"  - HP: {enemy_creature['hp']}, ATK: {enemy_creature['attack']}, DEF: {enemy_creature['defense']}\n"
             f"  - SPD: {enemy_creature['speed']}\n\n"

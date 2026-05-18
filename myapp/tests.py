@@ -183,7 +183,7 @@ class CombatSystemTests(TestCase):
         for c in self.creatures:
             CreatureMove.objects.create(creature=c, move=self.move, level_learned=1)
 
-        # Equipo del usuario con criaturas
+        # Equipo del usuario con pokémon
         self.team = Team.objects.create(name="Roca Team", user=self.user)
         for pos, c in enumerate(self.creatures[:3], start=1):
             TeamCreature.objects.create(team=self.team, creature=c, position=pos)

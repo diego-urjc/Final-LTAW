@@ -19,7 +19,7 @@
                 </div>
                 <div class="card-body">
                     {% if user_teams %}
-                        <p>Selecciona uno de tus equipos. El rival se generará aleatoriamente con el mismo número de criaturas.</p>
+                        <p>Selecciona uno de tus equipos. El rival se generará aleatoriamente con el mismo número de pokémon.</p>
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
@@ -28,7 +28,7 @@
                                     <option value="">-- Elige un equipo --</option>
                                     {% for team in user_teams %}
                                         <option value="{{ team.id }}">
-                                            {{ team.name }} ({{ team.num_creatures }} criatura{{ team.num_creatures|pluralize }})
+                                            {{ team.name }} ({{ team.num_creatures }} pokémon{{ team.num_creatures|pluralize }})
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -46,10 +46,10 @@
                     {% else %}
                         <div class="alert alert-warning mb-0">
                             <i class="bi bi-exclamation-triangle"></i>
-                            No tienes equipos con criaturas asignadas.
+                            No tienes equipos con pokémon asignadas.
                             <a href="{% url 'team_create' %}" class="alert-link">Crear un equipo</a>
                             o
-                            <a href="{% url 'my_teams' %}" class="alert-link">añade criaturas a uno existente</a>.
+                            <a href="{% url 'my_teams' %}" class="alert-link">añade pokémon a uno existente</a>.
                         </div>
                     {% endif %}
                 </div>

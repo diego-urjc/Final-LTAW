@@ -8,7 +8,7 @@ from .models import (
 
 @admin.register(Creature)
 class CreatureAdmin(admin.ModelAdmin):
-    """Administración de Criaturas"""
+    """Administración de Pokémon"""
     
     list_display = [
         'pokemon_id', 'sprite_preview', 'name', 'get_types_display',
@@ -82,7 +82,7 @@ class MoveAdmin(admin.ModelAdmin):
 
 @admin.register(CreatureMove)
 class CreatureMoveAdmin(admin.ModelAdmin):
-    """Administración de Movimientos de Criaturas"""
+    """Administración de Movimientos de Pokémon"""
     
     list_display = ['creature', 'move', 'level_learned', 'get_move_type_display']
     list_filter = ['level_learned', 'creature__type1', 'creature__type2', 'move__type', 'move__category']
@@ -98,7 +98,7 @@ class CreatureMoveAdmin(admin.ModelAdmin):
 
 
 class TeamCreatureInline(admin.TabularInline):
-    """Inline para gestionar criaturas en equipos"""
+    """Inline para gestionar pokémon en equipos"""
     
     model = TeamCreature
     extra = 1

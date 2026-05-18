@@ -23,21 +23,21 @@
                         </div>
                         
                         <div id="battle-options" class="mb-3" {% if preselected_context == 'team' %}style="display: none;"{% endif %}>
-                            <label class="form-label">Selecciona las criaturas para el combate</label>
+                            <label class="form-label">Selecciona las pokémon para el combate</label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label for="creature1" class="form-label">Tu Criatura</label>
+                                    <label for="creature1" class="form-label">Tu Pokémon</label>
                                     <select class="form-select" id="creature1" name="creature1">
-                                        <option value="">-- Elige una criatura --</option>
+                                        <option value="">-- Elige una pokémon --</option>
                                         {% for creature in creatures %}
                                         <option value="{{ creature.id }}">{{ creature.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="creature2" class="form-label">Criatura Enemiga</label>
+                                    <label for="creature2" class="form-label">Pokémon Enemiga</label>
                                     <select class="form-select" id="creature2" name="creature2">
-                                        <option value="">-- Elige una criatura --</option>
+                                        <option value="">-- Elige una pokémon --</option>
                                         {% for creature in creatures %}
                                         <option value="{{ creature.id }}">{{ creature.name }}</option>
                                         {% endfor %}

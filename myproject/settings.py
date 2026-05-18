@@ -32,7 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
 "final-ltaw.onrender.com",
-"http://127.0.0.1"
+"127.0.0.1"
 
 ]
 

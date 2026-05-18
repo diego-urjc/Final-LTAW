@@ -18,12 +18,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h5 class="text-primary mb-3">
-                                <i class="bi bi-person"></i> Criatura 1
+                                <i class="bi bi-person"></i> Pokémon 1
                             </h5>
                             <div class="form-group mb-3">
-                                <label for="creature1" class="form-label">Selecciona tu criatura:</label>
+                                <label for="creature1" class="form-label">Selecciona tu pokémon:</label>
                                 <select class="form-select" id="creature1" name="creature1" required>
-                                    <option value="">-- Elige una criatura --</option>
+                                    <option value="">-- Elige una pokémon --</option>
                                     {% for creature in creatures %}
                                     <option value="{{ creature.id }}">
                                         {{ creature.name }} (HP: {{ creature.hp }}, ATK: {{ creature.attack }}, SPD: {{ creature.speed }})
@@ -35,12 +35,12 @@
                         
                         <div class="col-md-6">
                             <h5 class="text-warning mb-3">
-                                <i class="bi bi-person-badge"></i> Criatura 2 (Oponente)
+                                <i class="bi bi-person-badge"></i> Pokémon 2 (Oponente)
                             </h5>
                             <div class="form-group mb-3">
                                 <label for="creature2" class="form-label">Selecciona el oponente:</label>
                                 <select class="form-select" id="creature2" name="creature2" required>
-                                    <option value="">-- Elige una criatura --</option>
+                                    <option value="">-- Elige una pokémon --</option>
                                     {% for creature in creatures %}
                                     <option value="{{ creature.id }}">
                                         {{ creature.name }} (HP: {{ creature.hp }}, ATK: {{ creature.attack }}, SPD: {{ creature.speed }})
@@ -76,7 +76,7 @@
             </h5>
             <ul class="mb-0">
                 <li>Combate 1vs1 simple</li>
-                <li>Cada criatura tiene puntos de vida (HP)</li>
+                <li>Cada pokémon tiene puntos de vida (HP)</li>
                 <li>Los movimientos causan daño fijo</li>
                 <li>El orden de turnos depende de la velocidad (SPD)</li>
                 <li>Gana quien reduzca el HP del oponente a 0 primero</li>
@@ -117,7 +117,7 @@ function getAIRecommendation() {
     const creature2 = document.getElementById('creature2').value;
     
     if (!creature1 || !creature2) {
-        alert('Por favor, selecciona ambas criaturas antes de pedir consejos de IA.');
+        alert('Por favor, selecciona ambas pokémon antes de pedir consejos de IA.');
         return;
     }
     

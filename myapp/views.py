@@ -5,6 +5,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
+from django.utils import timezone
 from .forms import CustomUserCreationForm, TeamForm
 from .models import Team, TeamCreature, Battle, Creature, CreatureMove, AIMessage
 from .services.nvidia_service import NVIDIABuildService, NVIDIAServiceError
@@ -114,7 +115,7 @@ def team_detail(request, team_id):
         id=team_id
     )
     
-    # Obtener las criaturas del equipo con sus posiciones
+    # Obtener las pokémon del equipo con sus posiciones
     team_creatures = TeamCreature.objects.filter(team=team).select_related('creature').order_by('position')
     
     # Verificar si el usuario es el dueño
@@ -215,7 +216,7 @@ MAX_TEAM_SIZE = 6
 
 @login_required
 def team_add_creature(request, team_id):
-    """Vista para añadir una criatura a un equipo (solo el dueño)."""
+    """Vista para añadir una pokémon a un equipo (solo el dueño)."""
     team = get_object_or_404(Team, id=team_id)
 
     if team.user != request.user:
@@ -227,7 +228,7 @@ def team_add_creature(request, team_id):
     used_creature_ids = set(current_members.values_list('creature_id', flat=True))
 
     if len(used_positions) >= MAX_TEAM_SIZE:
-        messages.warning(request, f'El equipo ya tiene el máximo de {MAX_TEAM_SIZE} criaturas.')
+        messages.warning(request, f'El equipo ya tiene el máximo de {MAX_TEAM_SIZE} pokémon.')
         return redirect('team_detail', team_id=team.id)
 
     available_creatures = Creature.objects.exclude(id__in=used_creature_ids).order_by('name')
@@ -243,13 +244,13 @@ def team_add_creature(request, team_id):
             position = None
 
         if not creature_id or position not in available_positions:
-            messages.error(request, 'Selecciona una criatura y una posición válida.')
+            messages.error(request, 'Selecciona una pokémon y una posición válida.')
             return redirect('team_add_creature', team_id=team.id)
 
         creature = get_object_or_404(Creature, id=creature_id)
 
         if creature.id in used_creature_ids:
-            messages.error(request, 'Esa criatura ya está en el equipo.')
+            messages.error(request, 'Esa pokémon ya está en el equipo.')
             return redirect('team_add_creature', team_id=team.id)
 
         TeamCreature.objects.create(team=team, creature=creature, position=position)
@@ -260,7 +261,7 @@ def team_add_creature(request, team_id):
         return redirect('team_detail', team_id=team.id)
 
     context = {
-        'title': f'Añadir criatura a {team.name} - PocketArena',
+        'title': f'Añadir pokémon a {team.name} - PocketArena',
         'team': team,
         'available_creatures': available_creatures,
         'available_positions': available_positions,
@@ -271,7 +272,7 @@ def team_add_creature(request, team_id):
 
 @login_required
 def team_remove_creature(request, team_id, tc_id):
-    """Vista para quitar una criatura del equipo (solo el dueño, POST)."""
+    """Vista para quitar una pokémon del equipo (solo el dueño, POST)."""
     team = get_object_or_404(Team, id=team_id)
 
     if team.user != request.user:
@@ -318,7 +319,7 @@ RANDOM_BATTLE_SIZE = 6
 
 
 def _build_random_team(size, exclude_ids=None):
-    """Devuelve una lista de IDs aleatorios de criaturas."""
+    """Devuelve una lista de IDs aleatorios de pokémon."""
     qs = Creature.objects.all()
     if exclude_ids:
         qs = qs.exclude(id__in=exclude_ids)
@@ -327,7 +328,7 @@ def _build_random_team(size, exclude_ids=None):
     return pool[:size]
 
 
-def _init_battle_session(request, mode, team1_ids, team2_ids):
+def _init_battle_session(request, mode, team1_ids, team2_ids, team1_db_id=None):
     """Crea la estructura de combate en la sesión a partir de dos listas de ids."""
     by_id = {c.id: c for c in Creature.objects.filter(id__in=set(team1_ids) | set(team2_ids))}
     hp1 = [by_id[cid].hp for cid in team1_ids if cid in by_id]
@@ -336,6 +337,7 @@ def _init_battle_session(request, mode, team1_ids, team2_ids):
         'mode': mode,
         'team1': list(team1_ids),
         'team2': list(team2_ids),
+        'team1_db_id': team1_db_id,
         'hp1': hp1,
         'hp2': hp2,
         'active1': 0,
@@ -344,6 +346,8 @@ def _init_battle_session(request, mode, team1_ids, team2_ids):
         'log': [],
         'finished': False,
         'winner': None,
+        'started_at': timezone.now().isoformat(),
+        'saved': False,
     }
 
 
@@ -386,15 +390,15 @@ def battle_normal_setup(request):
         team1_ids = [tc.creature_id for tc in team_creatures]
 
         if not team1_ids:
-            messages.error(request, 'El equipo seleccionado no tiene criaturas.')
+            messages.error(request, 'El equipo seleccionado no tiene pokémon.')
             return redirect('team_detail', team_id=team.id)
 
         if Creature.objects.count() < len(team1_ids):
-            messages.error(request, 'No hay suficientes criaturas en el sistema para generar un rival.')
+            messages.error(request, 'No hay suficientes pokémon en el sistema para generar un rival.')
             return redirect('battle_setup')
 
         team2_ids = _build_random_team(len(team1_ids))
-        _init_battle_session(request, mode='normal', team1_ids=team1_ids, team2_ids=team2_ids)
+        _init_battle_session(request, mode='normal', team1_ids=team1_ids, team2_ids=team2_ids, team1_db_id=team.id)
         messages.success(request, f'¡Combate normal iniciado con el equipo "{team.name}"!')
         return redirect('battle_turn')
 
@@ -411,7 +415,7 @@ def battle_random_start(request):
     if Creature.objects.count() < RANDOM_BATTLE_SIZE * 2:
         messages.error(
             request,
-            f'Se necesitan al menos {RANDOM_BATTLE_SIZE * 2} criaturas en el sistema para un combate random.'
+            f'Se necesitan al menos {RANDOM_BATTLE_SIZE * 2} pokémon en el sistema para un combate random.'
         )
         return redirect('battle_setup')
 
@@ -595,7 +599,7 @@ def battle_turn(request):
                     return HttpResponse(status=204, headers={'HX-Redirect': '/battle/result/'})
                 return redirect('battle_result')
 
-            # Tras procesar, recargamos las criaturas activas (pueden haber cambiado
+            # Tras procesar, recargamos las pokémon activas (pueden haber cambiado
             # por relevo automático).
             creature1 = Creature.objects.get(id=battle['team1'][battle['active1']])
             creature2 = Creature.objects.get(id=battle['team2'][battle['active2']])
@@ -682,6 +686,31 @@ def battle_result(request):
         'survivors_2': sum(1 for s in team2_slots if not s['fainted']),
     }
 
+    # Persistir el combate en la base de datos para las estadísticas del perfil.
+    # Solo se guarda una vez por combate (flag 'saved' en la sesión).
+    if not battle.get('saved'):
+        winner_db = {1: 'player1', 2: 'player2', 0: 'draw'}.get(winner)
+        team1_obj = None
+        if battle.get('team1_db_id'):
+            team1_obj = Team.objects.filter(id=battle['team1_db_id']).first()
+        started_at = battle.get('started_at')
+        if started_at:
+            from django.utils.dateparse import parse_datetime
+            started_at = parse_datetime(started_at)
+        Battle.objects.create(
+            player1=request.user,
+            player2=None,
+            team1=team1_obj,
+            team2=None,
+            status='finished',
+            current_turn=battle.get('turn', 1),
+            winner=winner_db,
+            started_at=started_at,
+            finished_at=timezone.now(),
+        )
+        battle['saved'] = True
+        request.session['battle'] = battle
+
     if 'battle' in request.session:
         del request.session['battle']
 
@@ -690,10 +719,10 @@ def battle_result(request):
 
 @login_required
 def creature_list(request):
-    """Lista todas las criaturas con nombre y descripción."""
+    """Lista todas las pokémon con nombre y descripción."""
     creatures = Creature.objects.all().order_by('name')
     context = {
-        'title': 'Criaturas - PocketArena',
+        'title': 'Pokémon - PocketArena',
         'creatures': creatures,
         'total': creatures.count(),
     }
@@ -725,13 +754,13 @@ def get_ai_recommendation(request):
                 creature2_id = request.POST.get('creature2')
                 
                 if not creature1_id or not creature2_id:
-                    messages.error(request, 'Debes seleccionar dos criaturas para obtener recomendación.')
+                    messages.error(request, 'Debes seleccionar dos pokémon para obtener recomendación.')
                     return redirect('battle_setup')
                 
                 creature1 = get_object_or_404(Creature, id=creature1_id)
                 creature2 = get_object_or_404(Creature, id=creature2_id)
                 
-                # Obtener movimientos de cada criatura
+                # Obtener movimientos de cada pokémon
                 creature1_moves = list(CreatureMove.objects.filter(
                     creature=creature1
                 ).select_related('move').values_list('move__name', flat=True))
@@ -800,7 +829,7 @@ def get_ai_recommendation(request):
                 
                 team = get_object_or_404(Team, id=team_id, user=request.user)
                 
-                # Obtener criaturas del equipo
+                # Obtener pokémon del equipo
                 team_creatures = TeamCreature.objects.filter(
                     team=team
                 ).select_related('creature').prefetch_related('creature__moves')
@@ -873,7 +902,7 @@ def get_ai_recommendation(request):
 
 
 def api_creatures_list(request):
-    """GET /api/creatures/ -> listado serializado de criaturas."""
+    """GET /api/creatures/ -> listado serializado de pokémon."""
     creatures = Creature.objects.all().order_by('name')
     data = [
         {

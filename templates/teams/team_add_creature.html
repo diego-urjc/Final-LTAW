@@ -8,7 +8,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'my_teams' %}">Mis Equipos</a></li>
             <li class="breadcrumb-item"><a href="{% url 'team_detail' team.id %}">{{ team.name }}</a></li>
-            <li class="breadcrumb-item active">Añadir criatura</li>
+            <li class="breadcrumb-item active">Añadir pokémon</li>
         </ol>
     </nav>
 
@@ -17,7 +17,7 @@
             <div class="card border-success">
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0">
-                        <i class="bi bi-plus-circle"></i> Añadir criatura a {{ team.name }}
+                        <i class="bi bi-plus-circle"></i> Añadir pokémon a {{ team.name }}
                     </h4>
                 </div>
                 <div class="card-body">
@@ -26,9 +26,9 @@
                             {% csrf_token %}
 
                             <div class="mb-3">
-                                <label for="creature" class="form-label">Criatura</label>
+                                <label for="creature" class="form-label">Pokémon</label>
                                 <select class="form-select" id="creature" name="creature" required>
-                                    <option value="">-- Elige una criatura --</option>
+                                    <option value="">-- Elige un pokémon--</option>
                                     {% for creature in available_creatures %}
                                         <option value="{{ creature.id }}"
                                                 data-type="{{ creature.get_types_display }}"
@@ -78,7 +78,7 @@
                             {% if not available_positions %}
                                 Este equipo ya tiene todas las posiciones ocupadas.
                             {% else %}
-                                No quedan criaturas disponibles para añadir.
+                                No quedan pokemon disponibles para añadir.
                             {% endif %}
                             <a href="{% url 'team_detail' team.id %}" class="alert-link">Volver al equipo</a>.
                         </div>
@@ -89,7 +89,7 @@
             {% if current_members %}
             <div class="card mt-3">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-people-fill"></i> Criaturas actuales</h6>
+                    <h6 class="mb-0"><i class="bi bi-people-fill"></i> Pokémon actuales</h6>
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for tc in current_members %}

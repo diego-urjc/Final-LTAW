@@ -4,7 +4,7 @@
 
 ## Descripción general
 
-PocketArena será una aplicación web desarrollada con Django inspirada en los simuladores de combate por turnos como Pokémon Showdown. La aplicación permitirá a los usuarios registrarse, crear equipos de criaturas y participar en combates contra equipos controlados por la aplicación.
+PocketArena será una aplicación web desarrollada con Django inspirada en los simuladores de combate por turnos como Pokémon Showdown. La aplicación permitirá a los usuarios registrarse, crear equipos de pokémon y participar en combates contra equipos controlados por la aplicación.
 
 Además del sistema de combate, la plataforma incluirá funcionalidades sociales básicas, como compartir equipos públicamente, consultar perfiles de usuario y visualizar el historial de partidas.
 
@@ -51,9 +51,9 @@ Se utilizará la plataforma NVIDIA Build para integrar funcionalidades de inteli
 
 Información de autenticación y perfil del jugador.
 
-### Criatura
+### Pokémon
 
-Datos básicos de cada criatura:
+Datos básicos de cada pokémon:
 
 * nombre,
 * tipo,
@@ -62,11 +62,11 @@ Datos básicos de cada criatura:
 
 ### Equipo
 
-Conjunto de criaturas asociadas a un usuario.
+Conjunto de pokémon asociadas a un usuario.
 
 ### Movimiento
 
-Ataques disponibles para las criaturas.
+Ataques disponibles para las pokémon.
 
 ### Combate
 

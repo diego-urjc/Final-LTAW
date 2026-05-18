@@ -45,7 +45,7 @@ urlpatterns = [
     path("battle/turn/", views.battle_turn, name="battle_turn"),
     path("battle/result/", views.battle_result, name="battle_result"),
 
-    # Rutas de Criaturas
+    # Rutas de Pokémon
     path("creatures/", views.creature_list, name="creature_list"),
     
     # Rutas de IA

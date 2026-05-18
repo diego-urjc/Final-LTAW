@@ -10,7 +10,7 @@ Estrategia:
    completando con los que falten si no hay suficientes con poder.
 4. Cada Move se descarga UNA sola vez (cache por URL) y se guarda en
    el modelo Move (update_or_create por `name` que es unique).
-5. Se enlazan a la criatura vía CreatureMove con `level_learned`.
+5. Se enlazan a la pokémon vía CreatureMove con `level_learned`.
 """
 
 import time
@@ -145,12 +145,12 @@ class Command(BaseCommand):
         total = creatures.count()
         if total == 0:
             self.stdout.write(self.style.ERROR(
-                "No hay criaturas con pokemon_id. Ejecuta antes 'import_pokemon'."
+                "No hay pokémon con pokemon_id. Ejecuta antes 'import_pokemon'."
             ))
             return
 
         self.stdout.write(self.style.MIGRATE_HEADING(
-            f"Asignando hasta {MOVES_PER_CREATURE} movimientos a {total} criaturas..."
+            f"Asignando hasta {MOVES_PER_CREATURE} movimientos a {total} pokémon..."
         ))
 
         move_cache = {}

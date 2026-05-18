@@ -34,7 +34,7 @@ Cambios solo en `admin.py`:
 - **CreatureAdmin**: stats especiales en `list_display`, `date_hierarchy`, `list_per_page=25`.
 - **MoveAdmin**: filtros por precisión/fecha, `list_per_page=50`.
 - **CreatureMoveAdmin**: método `get_move_type_display`, filtros por tipo y categoría.
-- **TeamCreatureInline**: `autocomplete_fields` en criatura.
+- **TeamCreatureInline**: `autocomplete_fields` en pokémon.
 - **TeamAdmin**: `list_editable=is_public`, autocomplete de usuario, `date_hierarchy`.
 - **BattleTurnInline**: más `readonly_fields`, `can_delete=False`.
 - **BattleAdmin / BattleTurnAdmin**: filtros por fechas y daño, autocomplete de jugadores/equipos/combate.
@@ -43,7 +43,7 @@ Cambios solo en `admin.py`:
 
 ## Fase 5: Datos iniciales
 - **Estructura**: `myapp/management/__init__.py`, `myapp/management/commands/__init__.py` para soportar comandos personalizados.
-- **Decisión**: las criaturas inventadas iniciales se han descartado en favor de la importación real desde PokéAPI (ver Fase 11). La base de datos arranca vacía y se puebla con `python manage.py import_pokemon`.
+- **Decisión**: las pokémon inventadas iniciales se han descartado en favor de la importación real desde PokéAPI (ver Fase 11). La base de datos arranca vacía y se puebla con `python manage.py import_pokemon`.
 
 ---
 
@@ -103,18 +103,18 @@ Cambios solo en `admin.py`:
 
 ---
 
-## Fase 11: Gestión de Criaturas en Equipo y Navegación
+## Fase 11: Gestión de Pokémon en Equipo y Navegación
 - **views.py**: `team_add_creature` (valida tope de 6, posición libre, no duplicados) y `team_remove_creature` (POST + CSRF), ambas restringidas al dueño.
 - **urls.py**: `teams/<id>/creatures/add/` y `teams/<id>/creatures/<tc_id>/remove/`.
-- **Plantilla `team_add_creature.html`**: selector de criaturas, preview JS de stats y lista de miembros; `team_detail.html` con botones de añadir/eliminar.
-- **Menú de combate**: `battle_setup` con tarjetas **Normal** (selector de equipo + CPU aleatoria) y **Random** (6vs6 aleatorio, requiere ≥12 criaturas).
-- **Refactor combate por equipos**: cada bando con lista de criaturas, HP por slot e índice activo; **relevo automático** al caer el activo; cabecera con slots vivos/caídos en `battle_arena.html` y `battle_result.html`.
-- **Catálogo `creature_list`** (`/creatures/`) en cuadrícula; navbar con entradas **Combates** y **Criaturas**.
+- **Plantilla `team_add_creature.html`**: selector de pokémon, preview JS de stats y lista de miembros; `team_detail.html` con botones de añadir/eliminar.
+- **Menú de combate**: `battle_setup` con tarjetas **Normal** (selector de equipo + CPU aleatoria) y **Random** (6vs6 aleatorio, requiere ≥12 pokémon).
+- **Refactor combate por equipos**: cada bando con lista de pokémon, HP por slot e índice activo; **relevo automático** al caer el activo; cabecera con slots vivos/caídos en `battle_arena.html` y `battle_result.html`.
+- **Catálogo `creature_list`** (`/creatures/`) en cuadrícula; navbar con entradas **Combates** y **Pokémon**.
 
 ---
 
 ## Fase 12: Integración PokéAPI
-- **Modelo `Creature`**: nuevo campo `pokemon_id` (`PositiveIntegerField`, `unique`, `null/blank`) para distinguir criaturas importadas de custom.
+- **Modelo `Creature`**: nuevo campo `pokemon_id` (`PositiveIntegerField`, `unique`, `null/blank`) para distinguir pokémon importadas de custom.
 - **admin.py**: columnas `pokemon_id` y `sprite_preview` (miniatura 48×48), búsqueda y edición por `pokemon_id`.
 - **Comando `import_pokemon.py`**: consume `https://pokeapi.co/api/v2/pokemon/{id}/` con `requests`; flags `--start`, `--limit` (151), `--delay`, `--timeout`, `--replace`.
 - **Idempotente**: `update_or_create(pokemon_id=...)`; captura `HTTPError`/`RequestException`/`ValueError` por Pokémon y reporta fallidos al final.
@@ -138,10 +138,10 @@ Cambios solo en `admin.py`:
 - **Modelos**: `CreatureModelTests`, `TeamModelTests`, `MoveModelTests` validan creación, `__str__` y formato de tipos.
 - **Autenticación (`AuthenticationTests`)**: login correcto/fallido, registro y logout.
 - **Vistas protegidas (`ProtectedViewTests`)**: redirección sin sesión y acceso autorizado a `profile`, `my_teams` y `battle_setup`.
-- **Combate (`CombatSystemTests`)**: criaturas con movimientos, cálculo de daño básico, inicio de sesión en `battle_setup` y restricción de `battle_turn` sin sesión activa.
-- **API (`APITests`)**: listado y detalle de criaturas, 404 ante IDs inexistentes y listado de equipos públicos.
+- **Combate (`CombatSystemTests`)**: pokémon con movimientos, cálculo de daño básico, inicio de sesión en `battle_setup` y restricción de `battle_turn` sin sesión activa.
+- **API (`APITests`)**: listado y detalle de pokémon, 404 ante IDs inexistentes y listado de equipos públicos.
 - **Ejecución**: `python3 manage.py test myapp` (suite completa) o `python3 manage.py test myapp.tests.CreatureModelTests` (test específico).
 
 ---
 
-*PocketArena cubre actualmente: autenticación, modelos completos, admin avanzado, CRUD de equipos con gestión de criaturas, combate por equipos con IA local, integración con NVIDIA Build API, importación de datos reales desde PokéAPI, API REST nativa con `JsonResponse` y suite de pruebas automatizadas.*
+*PocketArena cubre actualmente: autenticación, modelos completos, admin avanzado, CRUD de equipos con gestión de pokémon, combate por equipos con IA local, integración con NVIDIA Build API, importación de datos reales desde PokéAPI, API REST nativa con `JsonResponse` y suite de pruebas automatizadas.*

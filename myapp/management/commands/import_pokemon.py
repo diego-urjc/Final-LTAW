@@ -10,7 +10,7 @@ Estrategia:
 
 Limitaciones deliberadas (por diseño, no por error):
 - No importa movimientos, habilidades o tipos de efectividad.
-- Solo pokemon_id nullable para no romper criaturas legacy.
+- Solo pokemon_id nullable para no romper pokémon legacy.
 - Importación offline-only: las vistas no llaman a PokéAPI.
 """
 
@@ -142,7 +142,7 @@ class Command(BaseCommand):
         if replace:
             deleted, _ = Creature.objects.filter(pokemon_id__isnull=False).delete()
             self.stdout.write(self.style.WARNING(
-                f"--replace activo: eliminadas {deleted} criaturas importadas previas."
+                f"--replace activo: eliminadas {deleted} pokémon importadas previas."
             ))
 
         end = start + limit - 1
